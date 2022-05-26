@@ -1,5 +1,7 @@
 from array import array
 from typing import Tuple
+from pymba import Vimba, VimbaException
+from pymba import Frame
 from cv2 import Mat
 import cv2
 from datetime import datetime
@@ -37,6 +39,34 @@ def get_image_cam(source:int) -> None:
 
     return frame
 
+def get_image_Vimba() -> Frame:
+    """ Get image from Vimba Function.
+    
+    Use Vimba functions to take picture from Allied Vision cameras 
+    """
+    with Vimba() as vimba:
+        #init camera
+        camera = vimba.camera(0)
+        camera.open()
+        camera.arm('SingleFrame')
+
+        # capture a single frame, more than once if desired
+        try:
+            #take picture
+            frame = camera.acquire_frame()
+            #foto = get_frame(frame)
+        except VimbaException as e:
+            # rearm camera upon frame timeout
+            if e.error_code == VimbaException.ERR_TIMEOUT:
+                print(e)
+                camera.disarm()
+                camera.arm('SingleFrame')
+            else:
+                raise
+        camera.disarm()
+        camera.close()
+
+    return frame
 
 def crop_image(img:Mat, Xi:int, Xf:int, Yi:int, Yf:int) -> Mat:
     """ Crop image Function.
@@ -90,9 +120,9 @@ def RGB2binary(img:Mat) -> Mat:
     #gray scale
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #treshhold over 1st value will covert to 2nd value
-    image_res ,img = cv2.threshold(img,20,255,cv2.THRESH_BINARY)
+    image_res ,img = cv2.threshold(img,50,255,cv2.THRESH_BINARY)
     #arreglo chiquito para hacer operaciones morfologicas
-    kernel = np.ones((5,5),np.uint8)
+    kernel = np.ones((3,3),np.uint8)
     #filtro de morfología abierto
     img = cv2.morphologyEx(img,cv2.MORPH_OPEN,kernel) 
     #transformación NO SE
@@ -105,8 +135,33 @@ def RGB2binary(img:Mat) -> Mat:
 
     return img
     
+def vimba2binary(img: Frame) ->Mat:
+    """ Gray to Binary Function. Allied Vision Camera
+    Process a grayscale Vimba image with morphology techniques to convert
+    it into a binary array 
+    @img parameter image (3 dimensions Mat)"""
 
-def count_objects_AnP(image:Mat, show:bool, show_more:bool) -> Tuple[list, ...]:
+    #pymba image to numpy array
+    img = img.buffer_data_numpy()
+    #blur image
+    aver = cv2.medianBlur(img,1)
+    img = cv2.medianBlur(img,9)
+    #treshhold over 1st value will covert to 2nd value
+    image_res ,img = cv2.threshold(img,50,255,cv2.THRESH_BINARY)
+    #arreglo chiquito para hacer operaciones morfologicas
+    kernel = np.ones((3,3),np.uint8)
+    #filtro de morfología abierto
+    img = cv2.morphologyEx(img,cv2.MORPH_OPEN,kernel) 
+    #transformación NO SE
+    img = cv2.distanceTransform(img,cv2.DIST_L2,5)
+    #reducir tamaño de objetos por factor
+    ret, img =  cv2.threshold(img, 0.06*img.max(),255,0)
+    #cambiar formato de u32 a u8
+    img = np.uint8(img)
+
+    return img, aver
+
+def count_objects_AnP(image:Mat, show:bool, show_more:bool) -> Mat:
     """ Count objects: Area and Perimeter Function.
     Count how many objects are detected in the given image, then shows 
     the info for each object: Area and Perimeter 
@@ -136,7 +191,7 @@ def count_objects_AnP(image:Mat, show:bool, show_more:bool) -> Tuple[list, ...]:
         
     cnts = imutils.grab_contours(cnts)
     if show:
-        print("Objects in the image : ", len(cnts))
+        print("Objects in the image : ", i)
 
     return finalContours, cnts
 
@@ -201,10 +256,10 @@ def measure_objects(image: Mat, cnts: array, reference: float) -> Tuple[Mat, lis
         # draw the object sizes on the image
         cv2.putText(orig, "{:.1f}cm".format(dimA),
             (int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
-            0.45, (255, 255, 255), 1)
+            0.3, (255, 255, 255), 1)
         cv2.putText(orig, "{:.1f}cm".format(dimB),
             (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
-            0.45, (255, 255, 255), 1)
+            0.3, (255, 255, 255), 1)
         # show the output image
 
         sizes.append((dimA, dimB))
@@ -220,3 +275,17 @@ def img_detectSizes() -> Tuple[Mat, list]:
     
     # Cut the head off the list because it's the reference object
     return (img, sizes[1:])
+
+def print_typNcnt(img:Mat, objects:int, types:list) -> Mat:
+    # sort the contours from left-to-right and initialize the
+    # 'pixels per metric' calibration variable
+    (objects, _) = contours.sort_contours(objects)
+    #poner contornos y numeración
+    for (i, c) in enumerate(objects):
+        ((x, y), _) = cv2.minEnclosingCircle(c)
+        cv2.putText(img, "{}".format(i + 1), (int(x) - 41, int(y)+20),
+            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        cv2.putText(img, types[i][1], (int(x) - 20, int(y)+40),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 1)
+    
+    return img

@@ -1,7 +1,7 @@
 import helper
 import time
 import Vision as vs
-from plc_dummy import PLC
+from PLC_sim.plc_dummy import PLC
 import pandas as pd
 
 # ------ Main Function ------ #
