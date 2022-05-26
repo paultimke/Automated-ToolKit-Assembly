@@ -1,5 +1,5 @@
 import snap7
-from DB_dummy import dummy
+from PLC_sim.DB_dummy import dummy
 
 # Works for only one Data Block per PLC
 class PLC:
@@ -13,7 +13,7 @@ class PLC:
 
     def __init__(self, DB_size) -> None:
         self.DBsize = DB_size
-        dummy.start("DataBlock.txt", DB_size)
+        dummy.start("PLC_sim/DataBlock.txt", DB_size)
         self.DB = dummy.DB_read()
         return None
 

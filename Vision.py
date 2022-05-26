@@ -217,9 +217,6 @@ def img_detectSizes() -> Tuple[Mat, list]:
     img = RGB2binary(image)
     _, contours = count_objects_AnP(img,0,0)
     img, sizes = measure_objects(image, contours,2.7)
-
-    cv2.imshow('aver', img)
-    cv2.waitKey()
     
     # Cut the head off the list because it's the reference object
     return (img, sizes[1:])
