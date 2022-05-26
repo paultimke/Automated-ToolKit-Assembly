@@ -46,3 +46,4 @@ if __name__ == "__main__":
 
     print(f"Current kit = {kit}")
     helper.compare_kits(kit, ref_kit, img)
+
