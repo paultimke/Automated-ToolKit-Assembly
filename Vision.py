@@ -147,7 +147,7 @@ def vimba2binary(img: Frame) ->Mat:
     aver = cv2.medianBlur(img,1)
     img = cv2.medianBlur(img,9)
     #treshhold over 1st value will covert to 2nd value
-    image_res ,img = cv2.threshold(img,50,255,cv2.THRESH_BINARY)
+    image_res ,img = cv2.threshold(img,40,255,cv2.THRESH_BINARY)
     #arreglo chiquito para hacer operaciones morfologicas
     kernel = np.ones((3,3),np.uint8)
     #filtro de morfología abierto
@@ -289,3 +289,17 @@ def print_typNcnt(img:Mat, objects:int, types:list) -> Mat:
             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 1)
     
     return img
+
+
+def res_vimba()-> None:
+    """ Restart Vimba Viewer settings to continous 
+    frame adquisition """
+    with Vimba() as vimba:
+        #init camera
+        camera = vimba.camera(0)
+        camera.open()
+        camera.arm('Continuous')
+        print('Ready')
+        camera.disarm()
+        camera.close()
+
