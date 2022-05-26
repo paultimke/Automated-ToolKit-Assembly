@@ -276,6 +276,19 @@ def img_detectSizes() -> Tuple[Mat, list]:
     # Cut the head off the list because it's the reference object
     return (img, sizes[1:])
 
+def print_count(img:Mat, objects:int) ->Mat:
+    # sort the contours from left-to-right and initialize the
+    # 'pixels per metric' calibration variable
+    (objects, _) = contours.sort_contours(objects)
+    #poner contornos y numeración
+    for (i, c) in enumerate(objects):
+        ((x, y), _) = cv2.minEnclosingCircle(c)
+        cv2.putText(img, "{}".format(i + 1), (int(x) - 41, int(y)+20),
+            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        #cv2.drawContours(img, [c], -1, (0, 255, 0), 2)
+    
+    return img 
+
 def print_typNcnt(img:Mat, objects:int, types:list) -> Mat:
     # sort the contours from left-to-right and initialize the
     # 'pixels per metric' calibration variable
