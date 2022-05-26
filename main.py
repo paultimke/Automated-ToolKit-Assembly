@@ -1,7 +1,7 @@
 import helper
 import time
 import Vision as vs
-from plc_dummy import PLC
+from PLC_sim.plc_dummy import PLC
 import pandas as pd
 
 # ------ Main Function ------ #
@@ -37,8 +37,6 @@ if __name__ == "__main__":
     ref_kit, n_IDs = helper.create_Kit(df)
 
     # ----- KIT ASSEMBLY ----- #
-
-    #main()
 
     # Take image, process and classify
     img, sizes = vs.img_detectSizes()
