@@ -80,7 +80,7 @@ def save_image(image:Mat, name:str, folder:str, show:bool) ->None:
     
 
 
-def RGB2binary(img:Mat) -> Mat:
+def RGB2binary(img: Mat) -> Mat:
     """ RGB to Binary Function.
     Process an RGB image with morphology techniques to convert
     it into a binary array 
@@ -90,7 +90,7 @@ def RGB2binary(img:Mat) -> Mat:
     #gray scale
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #treshhold over 1st value will covert to 2nd value
-    image_res ,img = cv2.threshold(img,20,255,cv2.THRESH_BINARY)
+    _ ,img = cv2.threshold(img,20,255,cv2.THRESH_BINARY)
     #arreglo chiquito para hacer operaciones morfologicas
     kernel = np.ones((5,5),np.uint8)
     #filtro de morfología abierto
@@ -213,7 +213,7 @@ def measure_objects(image: Mat, cnts: array, reference: float) -> Tuple[Mat, lis
 
 def img_detectSizes() -> Tuple[Mat, list]:
     #image = vs.get_image_cam(1)
-    image = cv2.imread('tst_img3.png')
+    image = cv2.imread('Test_images/tst_img3.png')
     img = RGB2binary(image)
     _, contours = count_objects_AnP(img,0,0)
     img, sizes = measure_objects(image, contours,2.7)
