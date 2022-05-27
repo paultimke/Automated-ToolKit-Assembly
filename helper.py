@@ -11,7 +11,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def create_RefList(df: pd.DataFrame) -> list:
+def create_RefSizesList(df: pd.DataFrame) -> list:
     ref_list = []
     for i in range(len(df.index)):
         ref_list.append((df.iloc[i][1], df.iloc[i][2]))
@@ -70,6 +70,7 @@ def compare_kits(cmp: list, ref: list, img: vs.Mat):
         vs.save_image(img, "Test", "Images", False)
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
+        vs.save_image(img, "Test", "Images", False)
 
 
 

@@ -144,10 +144,10 @@ def vimba2binary(img: Frame) ->Mat:
     #pymba image to numpy array
     img = img.buffer_data_numpy()
     #blur image
-    aver = cv2.medianBlur(img,1)
+    og_img = cv2.medianBlur(img,1)
     img = cv2.medianBlur(img,7)
     #treshhold over 1st value will covert to 2nd value
-    image_res ,img = cv2.threshold(img,37,255,cv2.THRESH_BINARY)
+    _ ,img = cv2.threshold(img,45,255,cv2.THRESH_BINARY)
     #arreglo chiquito para hacer operaciones morfologicas
     kernel = np.ones((3,3),np.uint8)
     #filtro de morfología abierto
@@ -155,11 +155,11 @@ def vimba2binary(img: Frame) ->Mat:
     #transformación NO SE
     img = cv2.distanceTransform(img,cv2.DIST_L2,5)
     #reducir tamaño de objetos por factor
-    ret, img =  cv2.threshold(img, 0.05*img.max(),255,0)
+    _, img =  cv2.threshold(img, 0.05*img.max(),255,0)
     #cambiar formato de u32 a u8
     img = np.uint8(img)
 
-    return img, aver
+    return img, og_img
 
 def count_objects_AnP(image:Mat, show:bool, show_more:bool) -> Mat:
     """ Count objects: Area and Perimeter Function.
@@ -298,26 +298,28 @@ def measure_objects(image:Mat, cnts:array, px_cm:int) -> Mat:
         cv2.putText(orig, "{:.1f}cm".format(dimB),
             (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
             0.3, (255, 255, 255), 1)
+
         DimA = round(dimA,2)
         DimB = round(dimB,2)
+
         sizes.append([DimA,DimB])
 
     return orig, sizes
 
-def img_detectSizes() -> Tuple[Mat, list]:
+def img_detectSizes(ref_img : int) -> Tuple[Mat, list]:
     #image = vs.get_image_cam(1)
     #image = cv2.imread('tst_img3.png')
     img = get_image_Vimba()
     #img = RGB2binary(image)
     img, og_img = vimba2binary(img)
     _, contours = count_objects_AnP(img,1,0)
-    img, sizes = measure_objects(img, contours, 2.7)
+    img, sizes = measure_objects(img, contours, ref_img)
 
     #nums = print_count(og_img, contours)
     #cv2.imshow('nums', nums)
     #cv2.imshow('LEC',img)
     #cv2.waitKey(0)
-    save_image(img, 'test','lec',False)
+    #save_image(img, 'test','Images\test_imgs',False)
     #cv2.destroyAllWindows()
     # Cut the head off the list because it's the reference object
     return (og_img, sizes[1:])
@@ -349,10 +351,10 @@ def print_typNcnt(img:Mat, objects:int, types:list) -> Mat:
     
     return img
 
-def get_ref_path(path:str,reference:int) -> Mat:
+def get_ref_path(path:str,reference:int) -> int:
     img, _ = get_image_path(path)
     img = RGB2binary(img)
-    _, cntz= count_objects_AnP(img,1,0)
+    _, cntz= count_objects_AnP(img,0,0)
     px_m = measure_first(cntz,reference)
 
     return px_m

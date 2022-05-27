@@ -34,15 +34,17 @@ if __name__ == "__main__":
     # Read Kits DataBase csv file
     df = pd.read_csv("Kits_DataBase.csv")
 
+    # Calibrate camera
+    ref_img = vs.get_ref_path("Images\Calibration_imgs\Ref-img_26cm.png", 2.79)
     # Ask user input for kit
     ref_kit, n_IDs = helper.create_Kit(df)
-
+    # Get reference sizes from CSV file
+    ref_sizes = helper.create_RefSizesList(df)
     # ----- KIT ASSEMBLY ----- #
 
     # Take image, process and classify
-    img, sizes = vs.img_detectSizes()      
-    
-    objects, kit = helper.classify(sizes, helper.create_RefList(df), n_IDs, df)
+    img, sizes = vs.img_detectSizes(ref_img)      
+    objects, kit = helper.classify(sizes, ref_sizes, n_IDs, df)
 
     print(f"Current kit = {kit}")
     helper.compare_kits(kit, ref_kit, img)
