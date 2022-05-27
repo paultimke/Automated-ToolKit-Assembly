@@ -3,6 +3,7 @@ import time
 import Vision as vs
 from PLC_sim.plc_dummy import PLC
 import pandas as pd
+import cv2
 
 # ------ Main Function ------ #
 def main() -> None:
@@ -38,10 +39,12 @@ if __name__ == "__main__":
 
     # ----- KIT ASSEMBLY ----- #
 
-    #main()
-
     # Take image, process and classify
-    img, sizes = vs.img_detectSizes()
+    for i in range(20):
+        img, sizes = vs.img_detectSizes()
+        cv2.waitKey(0)
+        
+    
     objects, kit = helper.classify(sizes, helper.create_RefList(df), n_IDs, df)
 
     print(f"Current kit = {kit}")

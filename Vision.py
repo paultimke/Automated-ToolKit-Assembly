@@ -268,13 +268,19 @@ def measure_objects(image: Mat, cnts: array, reference: float) -> Tuple[Mat, lis
 
 def img_detectSizes() -> Tuple[Mat, list]:
     #image = vs.get_image_cam(1)
-    image = cv2.imread('tst_img3.png')
-    img = RGB2binary(image)
-    _, contours = count_objects_AnP(img,0,0)
-    img, sizes = measure_objects(image, contours,2.7)
-    
+    #image = cv2.imread('tst_img3.png')
+    img = get_image_Vimba()
+    #img = RGB2binary(image)
+    img, og_img = vimba2binary(img)
+    _, contours = count_objects_AnP(img,1,0)
+    img, sizes = measure_objects(img, contours, 2.7)
+
+    cv2.imshow('LEC',img)
+    cv2.waitKey(0)
+    save_image(img, 'test','lec',False)
+    #cv2.destroyAllWindows()
     # Cut the head off the list because it's the reference object
-    return (img, sizes[1:])
+    return (og_img, sizes[1:])
 
 def print_count(img:Mat, objects:int) ->Mat:
     # sort the contours from left-to-right and initialize the
