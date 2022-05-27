@@ -145,9 +145,9 @@ def vimba2binary(img: Frame) ->Mat:
     img = img.buffer_data_numpy()
     #blur image
     aver = cv2.medianBlur(img,1)
-    img = cv2.medianBlur(img,9)
+    img = cv2.medianBlur(img,7)
     #treshhold over 1st value will covert to 2nd value
-    image_res ,img = cv2.threshold(img,40,255,cv2.THRESH_BINARY)
+    image_res ,img = cv2.threshold(img,37,255,cv2.THRESH_BINARY)
     #arreglo chiquito para hacer operaciones morfologicas
     kernel = np.ones((3,3),np.uint8)
     #filtro de morfología abierto
@@ -155,7 +155,7 @@ def vimba2binary(img: Frame) ->Mat:
     #transformación NO SE
     img = cv2.distanceTransform(img,cv2.DIST_L2,5)
     #reducir tamaño de objetos por factor
-    ret, img =  cv2.threshold(img, 0.06*img.max(),255,0)
+    ret, img =  cv2.threshold(img, 0.05*img.max(),255,0)
     #cambiar formato de u32 a u8
     img = np.uint8(img)
 
@@ -171,12 +171,13 @@ def count_objects_AnP(image:Mat, show:bool, show_more:bool) -> Mat:
     @show parameter Bool, if true prints values for all objects
     """
     cnts = cv2.findContours(image.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    contours, hierarchy = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
+    contourss, _ = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    (contourss, _) = contours.sort_contours(contourss)
+
     finalContours = []
     i = 0    #contador interno
     # for each contour found
-    for cnt in contours:
+    for cnt in contourss:
         # find its area in pixel
         area = cv2.contourArea(cnt)
         # minimum area value is to be fixed
@@ -198,11 +199,48 @@ def count_objects_AnP(image:Mat, show:bool, show_more:bool) -> Mat:
 def midpoint(ptA, ptB):
 	return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
-def measure_objects(image: Mat, cnts: array, reference: float) -> Tuple[Mat, list]:
+def measure_first(cnts:array, reference:int) -> Mat:
     # sort the contours from left-to-right and initialize the
     # 'pixels per metric' calibration variable
     (cnts, _) = contours.sort_contours(cnts)
-    pixelsPerMetric = None
+    for c in cnts:
+        # min object size
+        if cv2.contourArea(c) < 100:
+            continue
+
+        # calculate the rotated box of the contour
+        box = cv2.minAreaRect(c)
+        box = cv2.boxPoints(box)
+        box = np.array(box, dtype="int")
+        # order the points in the contour such that they appear
+        # in top-left, top-right, bottom-right, and bottom-left
+        # order, then draw the outline of the rotated bounding
+        # box
+        box = perspective.order_points(box)
+        # unpack the ordered bounding box, then compute the midpoint
+        # between the top-left and top-right coordinates, followed by
+        # the midpoint between bottom-left and bottom-right coordinates
+        (tl, tr, br, bl) = box
+        (tltrX, tltrY) = midpoint(tl, tr)
+        (blbrX, blbrY) = midpoint(bl, br)
+        # compute the midpoint between the top-left and top-right points,
+        # followed by the midpoint between the top-righ and bottom-right
+        (tlblX, tlblY) = midpoint(tl, bl)
+        (trbrX, trbrY) = midpoint(tr, br)
+        # compute the distance between midpoints
+        dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
+        dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
+        # if the pixels per metric has not been initialized, then
+        # calculate pixels per metric (in this case cm)
+        pixelsPerMetric = (dB / reference)
+
+    return pixelsPerMetric
+
+def measure_objects(image:Mat, cnts:array, px_cm:int) -> Mat:
+    # sort the contours from left-to-right and initialize the
+    # 'pixels per metric' calibration variable
+    (cnts, _) = contours.sort_contours(cnts)
+    pixelsPerMetric = px_cm #None
     sizes=[]
     for c in cnts:
         # min object size
@@ -230,7 +268,7 @@ def measure_objects(image: Mat, cnts: array, reference: float) -> Tuple[Mat, lis
         (tltrX, tltrY) = midpoint(tl, tr)
         (blbrX, blbrY) = midpoint(bl, br)
         # compute the midpoint between the top-left and top-right points,
-        # followed by the midpoint between the top-right and bottom-right
+        # followed by the midpoint between the top-righ and bottom-right
         (tlblX, tlblY) = midpoint(tl, bl)
         (trbrX, trbrY) = midpoint(tr, br)
         # draw the midpoints on the image
@@ -248,8 +286,8 @@ def measure_objects(image: Mat, cnts: array, reference: float) -> Tuple[Mat, lis
         dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
         # if the pixels per metric has not been initialized, then
         # calculate pixels per metric (in this case cm)
-        if pixelsPerMetric is None:
-            pixelsPerMetric = dB / reference
+        #if pixelsPerMetric is None:
+            #pixelsPerMetric = dB / reference
         # compute the size of the object
         dimA = dA / pixelsPerMetric
         dimB = dB / pixelsPerMetric
@@ -260,9 +298,9 @@ def measure_objects(image: Mat, cnts: array, reference: float) -> Tuple[Mat, lis
         cv2.putText(orig, "{:.1f}cm".format(dimB),
             (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
             0.3, (255, 255, 255), 1)
-        # show the output image
-
-        sizes.append((dimA, dimB))
+        DimA = round(dimA,2)
+        DimB = round(dimB,2)
+        sizes.append([DimA,DimB])
 
     return orig, sizes
 
@@ -311,6 +349,13 @@ def print_typNcnt(img:Mat, objects:int, types:list) -> Mat:
     
     return img
 
+def get_ref_path(path:str,reference:int) -> Mat:
+    img, _ = get_image_path(path)
+    img = RGB2binary(img)
+    _, cntz= count_objects_AnP(img,1,0)
+    px_m = measure_first(cntz,reference)
+
+    return px_m
 
 def res_vimba()-> None:
     """ Restart Vimba Viewer settings to continous 
