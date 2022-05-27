@@ -10,14 +10,14 @@ contador = 4
 #El contador empieza desde este numero en particular debido a la estructura que tendra la interfaz
 
 def printValues():
+	"""Esta funcion ahora mismo solo esta encargada de construir un diccionario con los valores dentro de los spinbox dinamicos"""
 	for renglon in range(0,cantidad_de_renglones):
 		dict_valores[f'Tipo{renglon+1}'] = dict_variables[renglon].get()
 		#En este for, se le pide a python que busque las variables (las cuales estan definidas mas adelante) y consiga el valor que esta dentro
 		#una vez con ese valor, se construye el segundo diccionario definido al principio del codigo
-		
+
 	print(dict_valores)  
 	#Este print ^ es temporal y es solo para confirmar que si funciona esta parte del codigo
-#Se define la funcion que se usara luego cada vez que se presione el boton
 
 df = pd.read_csv("../Kits_DataBase.csv")
 cantidad_de_renglones = len(df.index)
