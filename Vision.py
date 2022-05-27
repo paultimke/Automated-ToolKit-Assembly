@@ -275,8 +275,10 @@ def img_detectSizes() -> Tuple[Mat, list]:
     _, contours = count_objects_AnP(img,1,0)
     img, sizes = measure_objects(img, contours, 2.7)
 
-    cv2.imshow('LEC',img)
-    cv2.waitKey(0)
+    #nums = print_count(og_img, contours)
+    #cv2.imshow('nums', nums)
+    #cv2.imshow('LEC',img)
+    #cv2.waitKey(0)
     save_image(img, 'test','lec',False)
     #cv2.destroyAllWindows()
     # Cut the head off the list because it's the reference object

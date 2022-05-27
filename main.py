@@ -40,10 +40,7 @@ if __name__ == "__main__":
     # ----- KIT ASSEMBLY ----- #
 
     # Take image, process and classify
-    for i in range(20):
-        img, sizes = vs.img_detectSizes()
-        cv2.waitKey(0)
-        
+    img, sizes = vs.img_detectSizes()      
     
     objects, kit = helper.classify(sizes, helper.create_RefList(df), n_IDs, df)
 
