@@ -11,7 +11,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def create_RefList(df: pd.DataFrame) -> list:
+def create_RefSizesList(df: pd.DataFrame) -> list:
     ref_list = []
     for i in range(len(df.index)):
         ref_list.append((df.iloc[i][1], df.iloc[i][2]))
@@ -26,7 +26,7 @@ def create_Kit(df: pd.DataFrame) -> dict:
     for i in range(n_IDs):
         strings.append(df.iloc[i][0])
     for i in range(n_IDs):
-        Kit[strings[i]] = int(input(f"Item count for Type {i}: "))
+        Kit[strings[i]] = int(input(f"Item count for Type {strings[i]}: "))
     
     return (Kit, n_IDs)
 
@@ -58,7 +58,7 @@ def classify(obj_sizes: list, reference: list, n_types: int, df: pd.DataFrame) -
     # Classify each object and make a histogram of each type
     for i in range(n):
         for j in range(n_types):
-            if is_inRange(obj_sizes[i], reference[j], 0.1):
+            if is_inRange(obj_sizes[i], reference[j], 0.3):
                 objects.append((i, IDs[j]))
                 hist[IDs[j]] += 1
 
@@ -70,6 +70,7 @@ def compare_kits(cmp: list, ref: list, img: vs.Mat):
         vs.save_image(img, "Test", "Images", False)
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
+        vs.save_image(img, "Test", "Images", False)
 
 
 
