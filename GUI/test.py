@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 
+
 root = tk.Tk()
 #^Necesario para iniciar la interfaz
 root.title("Configuracion de kits")
@@ -50,11 +51,11 @@ kit1_tornillo3 = tk.IntVar()
 kit1_tornillo4 = tk.IntVar()
 #^ Mismo paso que el anterior solo que con int
 
-textbox1 = ttk.Entry(frm1, textvariable=kit1).grid(column=0, row=1)
-textbox2 = ttk.Entry(frm1, textvariable=kit1_tornillo1).grid(column=2, row=1)
-textbox3 = ttk.Entry(frm1, textvariable=kit1_tornillo2).grid(column=4, row=1)
-textbox4 = ttk.Entry(frm1, textvariable=kit1_tornillo3).grid(column=6, row=1)
-textbox5 = ttk.Entry(frm1, textvariable=kit1_tornillo4).grid(column=8, row=1)
+textbox = ttk.Entry(frm1, textvariable=kit1).grid(column=0, row=1)
+textbox = ttk.Entry(frm1, textvariable=kit1_tornillo1).grid(column=2, row=1)
+textbox = ttk.Entry(frm1, textvariable=kit1_tornillo2).grid(column=4, row=1)
+textbox = ttk.Entry(frm1, textvariable=kit1_tornillo3).grid(column=6, row=1)
+textbox = ttk.Entry(frm1, textvariable=kit1_tornillo4).grid(column=8, row=1)
 #Y utilizamos la variables anteriores para definir que comportamientos van a tener lo que sea que se escriba dentro de los espacios en blanco
 
 #FRAME 2
