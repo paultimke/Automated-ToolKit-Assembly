@@ -43,7 +43,7 @@ def is_inRange(val: tuple, ref: tuple, precision: float) -> bool:
     return (exp1 or exp2)
 
 
-def classify(obj_sizes: list, reference: list, n_types: int, df: pd.DataFrame) -> Tuple[list, list]:
+def classify(obj_sizes: list, ref_sizes: list, n_types: int, df: pd.DataFrame) -> Tuple[list, list]:
     n = len(obj_sizes) # Number of objects detected
     objects = []       # List to store the classification of each object
     hist = {}          # Dictionary to store the histogram
@@ -58,7 +58,7 @@ def classify(obj_sizes: list, reference: list, n_types: int, df: pd.DataFrame) -
     # Classify each object and make a histogram of each type
     for i in range(n):
         for j in range(n_types):
-            if is_inRange(obj_sizes[i], reference[j], 0.3):
+            if is_inRange(obj_sizes[i], ref_sizes[j], 0.3):
                 objects.append((i, IDs[j]))
                 hist[IDs[j]] += 1
 
@@ -67,10 +67,10 @@ def classify(obj_sizes: list, reference: list, n_types: int, df: pd.DataFrame) -
 def compare_kits(cmp: list, ref: list, img: vs.Mat):
     if cmp == ref:
         print(f"{bcolors.OKGREEN}Kit OK{bcolors.ENDC}")
-        vs.save_image(img, "Test", "Images", False)
+        vs.save_image(img, "Test", "Images/Passed_Kits")
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
-        vs.save_image(img, "Test", "Images", False)
+        vs.save_image(img, "Test", "Images/Passed_Kits")
 
 
 
