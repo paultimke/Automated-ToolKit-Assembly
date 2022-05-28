@@ -32,7 +32,7 @@ def main() -> None:
 
     # Take image, process and classify
     img, sizes = vs.img_detectSizes(ref_img)      
-    objects, kit = helper.classify(sizes, ref_sizes, n_IDs, df)
+    _, kit = helper.classify(sizes, ref_sizes, n_IDs, df)
 
     print(f"Current kit = {kit}")
     helper.compare_kits(kit, ref_kit, img)
