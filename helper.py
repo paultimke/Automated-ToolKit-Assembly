@@ -56,11 +56,11 @@ def classify(obj_sizes: list, reference: list, n_types: int, df: pd.DataFrame) -
         hist[IDs[i]] = 0
 
     # Classify each object and make a histogram of each type
-    for i in range(n):
-        for j in range(n_types):
-            if is_inRange(obj_sizes[i], reference[j], 0.1):
-                objects.append((i, IDs[j]))
-                hist[IDs[j]] += 1
+    for screw in range(n):
+        for id in range(n_types):
+            if is_inRange(obj_sizes[screw], reference[id], 0.1):
+                objects.append((screw, IDs[id]))
+                hist[IDs[id]] += 1
 
     return (objects, hist)
 
