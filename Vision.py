@@ -244,7 +244,7 @@ def measure_objects(image:Mat, cnts:array, px_cm:int) -> Mat:
     return orig, sizes
 
 def img_detectSizes(ref_img : int) -> Tuple[Mat, list]:
-    img,_ = get_image_from_path("Images/Test_Imgs/tst_img1.png")
+    img,_ = get_image_from_path("Images/Test_Imgs/tst_img2.png")
     img = RGB2binary(img)
     _, contours = count_objects_AnP(img)
     img, sizes = measure_objects(img, contours, ref_img)

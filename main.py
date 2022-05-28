@@ -10,14 +10,8 @@ REF_OBJ_SIZE = 2.76
 
 # ------ Main Function ------ #
 def main() -> None:
-    pass
 
-
-# ------ Program Start ------ #
-if __name__ == "__main__":
-
-    # ----- SETUP ----- #
-
+    # ---------- SETUP ---------- #
     # Hardware Setup
     plc = PLC(6)
     plc.clearDB()   
@@ -32,8 +26,9 @@ if __name__ == "__main__":
     # Get reference sizes from CSV file
     ref_sizes = helper.create_RefSizesList(df)
 
+    # ------- KIT ASSEMBLY ------- #
 
-    # ----- KIT ASSEMBLY ----- #
+    # ----- KIT VERIFICATION ----- #
 
     # Take image, process and classify
     img, sizes = vs.img_detectSizes(ref_img)      
@@ -41,3 +36,9 @@ if __name__ == "__main__":
 
     print(f"Current kit = {kit}")
     helper.compare_kits(kit, ref_kit, img)
+
+
+# ------ Program Start ------ #
+if __name__ == "__main__":
+    main()
+    

@@ -44,7 +44,7 @@ def is_inRange(val: tuple, ref: tuple, precision: float) -> bool:
 
 
 def classify(obj_sizes: list, ref_sizes: list, n_types: int, df: pd.DataFrame) -> Tuple[list, list]:
-    n = len(obj_sizes) # Number of objects detected
+    n_screws = len(obj_sizes) # Number of objects detected
     objects = []       # List to store the classification of each object
     hist = {}          # Dictionary to store the histogram
     IDs = []           # String List of ID tags
@@ -56,11 +56,11 @@ def classify(obj_sizes: list, ref_sizes: list, n_types: int, df: pd.DataFrame) -
         hist[IDs[i]] = 0
 
     # Classify each object and make a histogram of each type
-    for i in range(n):
-        for j in range(n_types):
-            if is_inRange(obj_sizes[i], ref_sizes[j], 0.3):
-                objects.append((i, IDs[j]))
-                hist[IDs[j]] += 1
+    for screw in range(n_screws):
+        for id in range(n_types):
+            if is_inRange(obj_sizes[screw], ref_sizes[id], 0.3):
+                objects.append((screw, IDs[id]))
+                hist[IDs[id]] += 1
 
     return (objects, hist)
 
