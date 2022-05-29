@@ -93,7 +93,7 @@ def compare_kits(cmp: list, ref: list, img: vs.Mat):
         vs.save_image(img, "Test", "Images/Passed_Kits")
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
-        vs.save_image(img, "Test", "Images/Passed_Kits")
+        vs.save_image(img, "Test", "Images/Rejected_Kits")
 
 
 
