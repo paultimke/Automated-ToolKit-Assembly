@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
+from turtle import bgcolor
 import pandas as pd
 import csv 
 
 import helper
 import main
+import Global_vars as global_vars
 
 
 class Registro_kits(tk.Toplevel):#***************** VENTANA DE REGISTRO DE KITS ********************
@@ -16,6 +18,7 @@ class Registro_kits(tk.Toplevel):#***************** VENTANA DE REGISTRO DE KITS 
 
 		#Caracteristicas de la ventana
 		self.title("Registro de kits (Nombre temporal)")
+		self.configure(bg = global_vars.UI_BACKGROUND_COLOR)
 
 		#Frames de trabajo
 		self.frm1 = ttk.Frame(self, padding=20)
@@ -99,6 +102,7 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 
 		#Caracteristicas de la ventana
 		self.title("Selector de kits (Nombre temporal)")
+		self.configure(bg = global_vars.UI_BACKGROUND_COLOR)
 
 		#Frames de trabajo
 		self.frm1 = ttk.Frame(self, padding=20)
@@ -118,6 +122,7 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		for x in range(1,len(self.bigdata)):
 			self.lista_kits.append(self.bigdata[x][0]) 
 
+
 		#FRAME 1
 		ttk.Label(self.frm1, text="Seleccionar kit:").grid(column=0, row=0)
 		ttk.Label(self.frm1, text="Cantidad de kits a realizar:").grid(column=2, row=0)
@@ -131,7 +136,8 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 
 		#FRAME 2
 		ttk.Label(self.frm2, width=3).grid(column=1, row=0)
-		ttk.Button(self.frm2, text="Registrar kit nuevo", command=self.Open_Registro).grid(column=2, row=0)
+		Reg_button = ttk.Button(self.frm2, text="Registrar kit nuevo", command=self.Open_Registro)
+		Reg_button.grid(column=2, row=0)
 	#FIN DE LA FUNCION __init__()
 
 	#Registro de kits - ventana

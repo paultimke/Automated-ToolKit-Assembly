@@ -2,7 +2,6 @@ import helper
 import time
 import Vision as vs
 from PLC_sim.plc_dummy import PLC
-import pandas as pd
 import main_UI as UI
 import Global_vars as glob
 
@@ -39,11 +38,11 @@ def Start_Assembly(kit: str, iterations: int) -> None:
 def Verify_Kit(ref_kit : dict) -> None:
 
     # Get reference sizes from CSV file
-    glob.ref_sizes = helper.create_RefSizesList()
+    ref_sizes = helper.create_RefSizesList()
 
     # Take image, process and classify
     img, sizes = vs.img_detectSizes()      
-    _, assembled_kit = helper.classify(sizes, glob.ref_sizes)
+    _, assembled_kit = helper.classify(sizes, ref_sizes)
 
     helper.compare_kits(assembled_kit, ref_kit, img)
 
