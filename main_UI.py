@@ -2,7 +2,11 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import pandas as pd
-import csv
+import csv 
+
+import helper
+import main
+
 
 class Registro_kits(tk.Toplevel):#***************** VENTANA DE REGISTRO DE KITS ********************
 
@@ -48,12 +52,12 @@ class Registro_kits(tk.Toplevel):#***************** VENTANA DE REGISTRO DE KITS 
 			self.contador += 2
 
 		#FRAME 3
-		ttk.Button(self.frm3, text='Guardar kit', command=self.printValues).grid(column=0, row=0)
+		ttk.Button(self.frm3, text='Guardar kit', command=self.register_csv_Values).grid(column=0, row=0)
 		ttk.Label(self.frm3, width=3).grid(column=1, row=0)
 		ttk.Button(self.frm3, text='Cerrar ventana', command=self.destroy).grid(column=2, row=0)
 	#FIN DE LA FUNCION __init__()
 
-	def printValues(self):
+	def register_csv_Values(self):
 		"""Imprime los valores en el csv al seleccionar el boton 'guardar kit'"""
 		with open ('GUI/DB_Selector.csv', 'r') as r:
 			csv_reader = csv.reader(r)
@@ -123,7 +127,7 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		ttk.Label(self.frm1, width=6).grid(column=1, row=1)
 		ttk.Spinbox(self.frm1, from_=0, to=9999, textvariable=self.cantidad_seleccion).grid(column=2, row=1)
 		ttk.Label(self.frm1, width=3).grid(column=3, row=1)
-		ttk.Button(self.frm1, text="Enviar Instrucción", command=self.SendValues).grid(column=4, row=1) #el text es temporal
+		ttk.Button(self.frm1, text="Enviar Instrucción", command=self.Start_Main_Process).grid(column=4, row=1) #el text es temporal
 
 		#FRAME 2
 		ttk.Label(self.frm2, width=3).grid(column=1, row=0)
@@ -137,8 +141,14 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		Registro.grab_set()
 	#FIN DE LA FUNCION open_registro()
 
-	def SendValues(self):
-		"""Se encarga de juntar los datos y de enviarlos - ahora mismo solo los imprime en la consola"""
+	def Start_Main_Process(self):
+		""" 1. - Se encarga de juntar los datos y de enviarlos
+			2. - Luego Empieza todo el proceso, desde crear los kits de referncia,
+				mandar la informacion al PLC del conveyor y el Robot para armar los kits
+				en fisico. Y finalmente, tomar la imagen y clasificar para ver si el kit
+				se armo de forma correcta."""
+
+		# Collect the kit information from the User Interface
 		for x in range(0,len(self.bigdata)):
 			if self.bigdata[x][0] == self.seleccion.get():
 				self.send_list = self.bigdata[x][1:]
@@ -147,6 +157,19 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 
 		self.lista_fin = [self.seleccion.get(), self.cantidad_seleccion.get()]
 		self.lista_fin.append(self.send_list)
+
+		# ---- Start The Process ---- #
+
+		# Create kit with the apropiate format needed for classification
+		ref_kit = helper.create_Kit(self.lista_fin)
+
+		# Send Commands to Robot and Conveyor PLC to start Assembly
+		DESIRED_KIT_NAME   : str = self.lista_fin[0]
+		DESIRED_ITERATIONS : int = self.lista_fin[1]
+		main.Start_Assembly(DESIRED_KIT_NAME, DESIRED_ITERATIONS)
+
+		# Takes an image of the assembled kit and verifies it for correctness
+		main.Verify_Kit(ref_kit)
 
 		print(self.lista_fin)
 	#FIN DE LA FUNCION sendValues()

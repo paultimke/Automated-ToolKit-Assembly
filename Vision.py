@@ -9,6 +9,7 @@ import imutils
 from imutils import perspective
 from imutils import contours
 from scipy.spatial import distance as dist
+import Global_vars as glob
 
 # CONSTANTS
 DEBUG = False
@@ -243,11 +244,20 @@ def measure_objects(image:Mat, cnts:array, px_cm:int) -> Mat:
 
     return orig, sizes
 
-def img_detectSizes(ref_img : int) -> Tuple[Mat, list]:
+def img_detectSizes() -> Tuple[Mat, list]:
+    """ Image Detect Sizes Function.
+    Takes a picture, processes it and returns a list of tuples representing
+    the sizes of each screw detected in the image
+
+    @Mat return -> Processed image
+    @sizes -> list of each screw's dimensions (length and width)
+    """
+    ref_size = glob.Calibration_size
+
     img,_ = get_image_from_path("Images/Test_Imgs/tst_img2.png")
     img = RGB2binary(img)
     _, contours = count_objects_AnP(img)
-    img, sizes = measure_objects(img, contours, ref_img)
+    img, sizes = measure_objects(img, contours, ref_size)
     return (img, sizes)
 
 
