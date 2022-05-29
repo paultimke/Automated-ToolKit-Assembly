@@ -11,6 +11,12 @@ from imutils import contours
 from scipy.spatial import distance as dist
 import Global_vars as glob
 
+try:
+    from pymba import Vimba, VimbaException
+    from pymba import Frame
+except:
+    pass
+
 # CONSTANTS
 DEBUG = False
 
@@ -25,6 +31,36 @@ def get_image_from_path(path:str) -> None:
     size = image.shape 
 
     return image, size
+
+def get_image_Vimba():
+    """ Get image from Vimba Function.
+    
+    Use Vimba functions to take picture from Allied Vision cameras 
+    @return Vimba Frame
+    """
+    with Vimba() as vimba:
+        #init camera
+        camera = vimba.camera(0)
+        camera.open()
+        camera.arm('SingleFrame')
+
+        # capture a single frame, more than once if desired
+        try:
+            #take picture
+            frame = camera.acquire_frame()
+            #foto = get_frame(frame)
+        except VimbaException as e:
+            # rearm camera upon frame timeout
+            if e.error_code == VimbaException.ERR_TIMEOUT:
+                print(e)
+                camera.disarm()
+                camera.arm('SingleFrame')
+            else:
+                raise
+        camera.disarm()
+        camera.close()
+
+    return frame
 
 
 def crop_image(img:Mat, Xi:int, Xf:int, Yi:int, Yf:int) -> Mat:
@@ -93,6 +129,44 @@ def RGB2binary(img: Mat) -> Mat:
     img = np.uint8(img)
 
     return img
+
+def vimba2binary(img) ->Mat:
+    """ Gray to Binary Function. Allied Vision Camera
+    Process a grayscale Vimba image with morphology techniques to convert
+    it into a binary array 
+    @img parameter image (3 dimensions Mat) - Vimba Frame"""
+
+    #pymba image to numpy array
+    img = img.buffer_data_numpy()
+    #blur image
+    og_img = cv2.medianBlur(img,1)
+    img = cv2.medianBlur(img,7)
+    #treshhold over 1st value will covert to 2nd value
+    _ ,img = cv2.threshold(img,45,255,cv2.THRESH_BINARY)
+    #arreglo chiquito para hacer operaciones morfologicas
+    kernel = np.ones((3,3),np.uint8)
+    #filtro de morfología abierto
+    img = cv2.morphologyEx(img,cv2.MORPH_OPEN,kernel) 
+    #transformación NO SE
+    img = cv2.distanceTransform(img,cv2.DIST_L2,5)
+    #reducir tamaño de objetos por factor
+    _, img =  cv2.threshold(img, 0.05*img.max(),255,0)
+    #cambiar formato de u32 a u8
+    img = np.uint8(img)
+
+    return img, og_img
+
+def res_vimba()-> None:
+    """ Restart Vimba Viewer settings to continous 
+    frame adquisition """
+    with Vimba() as vimba:
+        #init camera
+        camera = vimba.camera(0)
+        camera.open()
+        camera.arm('Continuous')
+        print('Ready')
+        camera.disarm()
+        camera.close()
     
 
 def count_objects_AnP(image:Mat) -> Mat:
