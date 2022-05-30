@@ -43,14 +43,14 @@ class Registro_kits(tk.Toplevel):#***************** VENTANA DE REGISTRO DE KITS 
 		self.textbox = ttk.Entry(self.frm1, textvariable=self.kit_titulo).grid(column=2, row=0)
 
 		#FRAME 2
-		for self.renglon in range(0,self.cantidad_de_renglones):
-			self.dict_variables[self.renglon] = globals()[f'tornillo_tipo{self.renglon}+1'] = tk.IntVar()
+		for renglon in range(0,self.cantidad_de_renglones):
+			self.dict_variables[renglon] = globals()[f'tornillo_tipo{self.df.iloc[renglon][0]}+1'] = tk.IntVar()
 
 			ttk.Label(self.frm2, text="").grid(column=0, row=self.contador-1)
-			ttk.Label(self.frm2, text=f"Tornillo tipo #{self.renglon+1}:").grid(column=0, row=self.contador)
-			ttk.Label(self.frm2, width=3).grid(column=1, row=self.contador)
+			ttk.Label(self.frm2, text=f"Tipo {self.df.iloc[renglon][0]}:").grid(column=0, row=self.contador)
+			ttk.Label(self.frm2, width=1).grid(column=1, row=self.contador)
 
-			self.spinbox = ttk.Spinbox(self.frm2, width=6, from_=0, to=9999, textvariable=self.dict_variables[self.renglon]).grid(column=2, row=self.contador)
+			self.spinbox = ttk.Spinbox(self.frm2, width=6, from_=0, to=9999, textvariable=self.dict_variables[renglon]).grid(column=2, row=self.contador)
 
 			self.contador += 2
 
@@ -73,9 +73,9 @@ class Registro_kits(tk.Toplevel):#***************** VENTANA DE REGISTRO DE KITS 
 		self.flag = True
 		self.data.append(self.kit_titulo.get())
 
-		for self.renglon in range(0,self.cantidad_de_renglones):
-			self.header.append(f'T{self.renglon+1}') #Se reconstruye el header debido a la calidad variable de los T_Tornillo
-			self.data.append(self.dict_variables[self.renglon].get()) #Se construye un renglon nuevo para el nuevo kit
+		for renglon in range(0,self.cantidad_de_renglones):
+			self.header.append(f'T{renglon+1}') #Se reconstruye el header debido a la calidad variable de los T_Tornillo
+			self.data.append(self.dict_variables[renglon].get()) #Se construye un renglon nuevo para el nuevo kit
 
 		self.bigdata[0] = (self.header) #Se reemplaza el viejo header con el nuevo, en caso de haber nuevos T_tornillos
 
