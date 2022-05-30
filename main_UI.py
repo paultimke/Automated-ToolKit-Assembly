@@ -93,6 +93,8 @@ class Registro_kits(tk.Toplevel):#***************** VENTANA DE REGISTRO DE KITS 
 			writer = csv.writer(f)
 			for x in range(0,len(self.bigdata)):
 				writer.writerow(self.bigdata[x])
+	#FIN DE LA FUNCION register_csv_values()
+#END OF CLASS Registro_kits
 
 class root(tk.Tk):#******************************* VENTANA PRINCIPAL ******************************
 
@@ -127,12 +129,16 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		ttk.Label(self.frm1, text="Seleccionar kit:").grid(column=0, row=0)
 		ttk.Label(self.frm1, text="Cantidad de kits a realizar:").grid(column=2, row=0)
 
-		self.cbox = ttk.Combobox(self.frm1, state='readonly',values=self.lista_kits, textvariable=self.seleccion, postcommand=self.updt)
+		self.cbox = ttk.Combobox(self.frm1, state = 'readonly',
+								values = self.lista_kits, 
+								textvariable = self.seleccion, 
+								postcommand = self.updt_Combobox)
 		self.cbox.grid(column=0, row=1) #NOTA: esta linea tiene que estar aparte, de lo contrario, nunca se actualizara el combobox
 		ttk.Label(self.frm1, width=6).grid(column=1, row=1)
 		ttk.Spinbox(self.frm1, from_=0, to=9999, textvariable=self.cantidad_seleccion).grid(column=2, row=1)
 		ttk.Label(self.frm1, width=3).grid(column=3, row=1)
-		ttk.Button(self.frm1, text="Enviar Instrucción", command=self.Start_Main_Process).grid(column=4, row=1) #el text es temporal
+		global_vars.StartProcess_Btn = ttk.Button(self.frm1, text="Enviar Instrucción", command=self.Start_Main_Process)
+		global_vars.StartProcess_Btn.grid(column=4, row=1) #el text es temporal
 
 		#FRAME 2
 		ttk.Label(self.frm2, width=3).grid(column=1, row=0)
@@ -153,6 +159,9 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 				mandar la informacion al PLC del conveyor y el Robot para armar los kits
 				en fisico. Y finalmente, tomar la imagen y clasificar para ver si el kit
 				se armo de forma correcta."""
+
+		# Disable Button during Process to avoid multiple requests until process is done
+		global_vars.StartProcess_Btn.grid_forget()
 
 		# Collect the kit information from the User Interface
 		for x in range(0,len(self.bigdata)):
@@ -178,9 +187,12 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		main.Verify_Kit(ref_kit)
 
 		print(self.lista_fin)
-	#FIN DE LA FUNCION sendValues()
 
-	def updt(self):
+		# Process is done, now we can enable the Button again
+		global_vars.StartProcess_Btn.grid(column=4, row=1)
+	#FIN DE LA FUNCION Start_Main_Process()
+
+	def updt_Combobox(self):
 		"""Se encarga de actualizar la lista del combobox cada vez que es desplegada"""
 		self.lista_kits = []
 		with open ('GUI/DB_Selector.csv', 'r') as r:
@@ -189,9 +201,5 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		for x in range(1,len(self.bigdata)):
 			self.lista_kits.append(self.bigdata[x][0])
 		self.cbox['values'] = self.lista_kits
-	#FIN DE LA FUNCION updt()
-
-#Iniciar codigo
-if __name__ == "__main__":
-	root = root()
-	root.mainloop()
+	#FIN DE LA FUNCION updt_Combobox()
+#END OF CLASS root()
