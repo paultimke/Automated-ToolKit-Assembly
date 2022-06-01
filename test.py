@@ -1,25 +1,17 @@
-import tkinter as tk
-from tkinter import *
-from tkinter import ttk
+from numpy import ogrid
+import Vision as vs
+import Global_vars as glob
+import cv2
 
-root = tk.Tk()
+for i in range(5):
+    img = vs.get_image_Vimba()
+    _, og = vs.vimba2binary(img)
 
-def hola():
-    print("Hola")
+    vs.save_image(og, 'Ref-img_26cm', 'ParaChristian')
 
-def deact(btn):
-    btn.grid_forget()
+    cv2.imshow('cal', og)
 
-def act(btn):
-    btn.grid(column=0,row = 0)
+    cv2.waitKey(0)
 
-btn = ttk.Button(text = 'Hola', command = hola)
-btn.grid(column=0, row = 0)
 
-btn_deact = ttk.Button(text = 'deactivate', command = lambda : deact(btn))
-btn_deact.grid(column=1, row = 0)
-
-btn_act = ttk.Button(text = "act", command = lambda: act(btn))
-btn_act.grid(column=2, row = 0)
-
-root.mainloop()
+cv2.destroyAllWindows()

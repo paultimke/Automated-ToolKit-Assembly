@@ -44,8 +44,6 @@ def create_Kit(UI_kit: list) -> dict:
         strings.append(df.iloc[i][0])
     # Extract item count from selected kit
     for i in range(n_IDs):
-        #Kit[strings[i]] = int(input(f"Item count for Type {strings[i]}: "))
-
         # Third item of the list is another list containing the item counts as strings
         Kit[strings[i]] = int(UI_kit[2][i])
     
@@ -91,6 +89,7 @@ def compare_kits(cmp: list, ref: list, img: vs.Mat):
     if cmp == ref:
         print(f"{bcolors.OKGREEN}Kit OK{bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Passed_Kits")
+
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Rejected_Kits")

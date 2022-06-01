@@ -76,6 +76,7 @@ def Verify_Kit(ref_kit : dict) -> None:
     _, assembled_kit = helper.classify(sizes, ref_sizes)
 
     helper.compare_kits(assembled_kit, ref_kit, img)
+    
 
     print(f"Current kit = {assembled_kit}")
 #END OF FUNCTION Verify_Kit()

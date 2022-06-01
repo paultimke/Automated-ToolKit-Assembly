@@ -4,8 +4,11 @@ from tkinter import ttk
 
 # ---------- CONSTANTS ---------- #
 # Calibration Related
-REF_IMG_PATH = "Images/Calibration/Ref-img_test.png"
-REF_OBJ_SIZE = 2.76
+TEST_REF_IMG_PATH = "Images/Calibration/Ref-img_test.png"
+TEST_REF_OBJ_SIZE = 2.76
+
+REF_IMG_PATH = "Images/Calibration/Ref-img_26cm.png"
+REF_OBJ_SIZE = 2.8
 
 # Path to the CSV file with each screw's size information
 KITS_DB_CSV_PATH = "Kits_DataBase.csv"

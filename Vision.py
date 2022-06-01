@@ -209,7 +209,7 @@ def midpoint(ptA, ptB):
 	return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
 
-def measure_reference(cnts:array, reference:int) -> Mat:
+def measure_reference(cnts:array, reference:int) -> int:
     # sort the contours from left-to-right and initialize the
     # 'pixels per metric' calibration variable
     (cnts, _) = contours.sort_contours(cnts)
@@ -328,10 +328,10 @@ def img_detectSizes() -> Tuple[Mat, list]:
     """
     ref_size = glob.Calibration_size
 
-    #img = get_image_Vimba()
-    #img = vimba2binary(img)
-    img,_ = get_image_from_path("Images/Test_Imgs/tst_img2.png")
-    img = RGB2binary(img)
+    img = get_image_Vimba()
+    img, _ = vimba2binary(img)
+    #img,_ = get_image_from_path("Images/Test_Imgs/tst_img2.png")
+    #img = RGB2binary(img)
 
     _, contours = count_objects_AnP(img)
     img, sizes = measure_objects(img, contours, ref_size)
