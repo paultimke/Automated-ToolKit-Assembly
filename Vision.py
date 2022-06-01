@@ -115,15 +115,15 @@ def RGB2binary(img: Mat) -> Mat:
     #gray scale
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #treshhold over 1st value will covert to 2nd value
-    image_res ,img = cv2.threshold(img,50,255,cv2.THRESH_BINARY)
+    image_res ,img = cv2.threshold(img,15,255,cv2.THRESH_BINARY)
     #arreglo chiquito para hacer operaciones morfologicas
-    kernel = np.ones((3,3),np.uint8)
+    kernel = np.ones((2,2),np.uint8)
     #filtro de morfología abierto
     img = cv2.morphologyEx(img,cv2.MORPH_OPEN,kernel) 
     #transformación NO SE
     #img = cv2.distanceTransform(img,cv2.DIST_L2,5)
     #reducir tamaño de objetos por factor
-    _, img =  cv2.threshold(img, 0.06*img.max(),255,0)
+    _, img =  cv2.threshold(img, 0.05*img.max(),255,0)
 
     #cambiar formato de u32 a u8
     img = np.uint8(img)
@@ -142,9 +142,9 @@ def vimba2binary(img) ->Mat:
     og_img = cv2.medianBlur(img,1)
     img = cv2.medianBlur(img,7)
     #treshhold over 1st value will covert to 2nd value
-    _ ,img = cv2.threshold(img,45,255,cv2.THRESH_BINARY)
+    _ ,img = cv2.threshold(img,15,255,cv2.THRESH_BINARY)
     #arreglo chiquito para hacer operaciones morfologicas
-    kernel = np.ones((3,3),np.uint8)
+    kernel = np.ones((2,2),np.uint8)
     #filtro de morfología abierto
     img = cv2.morphologyEx(img,cv2.MORPH_OPEN,kernel) 
     #transformación NO SE
@@ -328,13 +328,14 @@ def img_detectSizes() -> Tuple[Mat, list]:
     """
     ref_size = glob.Calibration_size
 
-    img = get_image_Vimba()
-    img, _ = vimba2binary(img)
-    #img,_ = get_image_from_path("Images/Test_Imgs/tst_img2.png")
-    #img = RGB2binary(img)
+    #img = get_image_Vimba()
+    #img, _ = vimba2binary(img)
+    img,_ = get_image_from_path("Images\ParaChristian\Ref-img_26cm_31_05_2022__19h-29m-11s.png")
+    img = RGB2binary(img)
 
     _, contours = count_objects_AnP(img)
     img, sizes = measure_objects(img, contours, ref_size)
+    cv2.imshow('gg',img)
     return (img, sizes)
 
 
