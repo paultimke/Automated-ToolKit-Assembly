@@ -91,22 +91,28 @@ def classify(obj_sizes: list, ref_sizes: list) -> Tuple[list, list]:
 
 #------------------
 def send_alert_email(kit_type:str, kit_num:int):
+    kit_num = str(kit_num)
     email_pass : str = 'Robocop22'
     sender : str = 'modula.vision@gmail.com'
-    receivers : str = 'A01566759@tec.mx'
+    receivers : list = ['A01566664@tec.mx','christianloyapena@hotmail.com']
     port : int = 587
+
+    print(kit_num)
+    print(type(kit_num))
+    context = ssl.create_default_context()
 
     with smtplib.SMTP("smtp.gmail.com", port) as smtp:
         smtp.ehlo()
-        smtp.starttls()
+        smtp.starttls(context=context)
         smtp.ehlo()
 
         smtp.login(sender, email_pass)
 
-        subject = 'Kit', kit_type,'Terminado'
-        body = 'La estación de armado de kits del ModulaLift ha elaborado', kit_num, 'veces el kit', kit_type 
+        subject = 'Kit ' + kit_type + ' Terminado'
+        body = 'La estacion de armado de kits del ModulaLift ha elaborado ' + kit_num + ' veces el kit ' + kit_type
 
         message = f'subject: {subject}\n\n{body}'
+        #message = """ felicidades """
         smtp.sendmail(sender, receivers, message)
 #--------------------
 
@@ -115,7 +121,7 @@ def compare_kits(cmp: list, ref: list, img: vs.Mat, kit_type:str, kit_num:int):
     if cmp == ref:
         print(f"{bcolors.OKGREEN}Kit OK{bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Passed_Kits")
-
+        #send_alert_email(kit_type,kit_num)
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Rejected_Kits")
