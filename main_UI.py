@@ -184,7 +184,7 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		#main.Start_Assembly(DESIRED_KIT_NAME, DESIRED_ITERATIONS)
 
 		# Takes an image of the assembled kit and verifies it for correctness
-		main.Verify_Kit(ref_kit)
+		main.Verify_Kit(ref_kit,DESIRED_KIT_NAME,DESIRED_ITERATIONS)
 
 		print(self.lista_fin) # por mientras
 

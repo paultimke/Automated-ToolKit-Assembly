@@ -66,7 +66,7 @@ def Start_Assembly(kit: str, iterations: int) -> None:
 
 #END OF FUNCTION Start_Assembly()
 
-def Verify_Kit(ref_kit : dict) -> None:
+def Verify_Kit(ref_kit : dict, kit_type:str, kit_num:int) -> None:
 
     # Get reference sizes from CSV file
     ref_sizes = helper.create_RefSizesList()
@@ -75,7 +75,7 @@ def Verify_Kit(ref_kit : dict) -> None:
     img, sizes = vs.img_detectSizes()      
     _, assembled_kit = helper.classify(sizes, ref_sizes)
 
-    helper.compare_kits(assembled_kit, ref_kit, img)
+    helper.compare_kits(assembled_kit, ref_kit, img,kit_type,kit_num)
     
 
     print(f"Current kit = {assembled_kit}")
