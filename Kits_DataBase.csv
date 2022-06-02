@@ -1,6 +1,5 @@
-KitID, Length, Width
-grande,9.1,3.8
-mediano,3.1,1.65
-flaco,4,0.75
-tuerca,2,2
-
+KitID,Length,Width,Stock
+grande,9.1,3.8,10
+mediano,3.1,1.65,10
+flaco,4,0.75,10
+tuerca,2,2,10

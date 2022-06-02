@@ -1,6 +1,7 @@
 from typing import Tuple
 import pandas as pd
 import Vision as vs
+import csv
 
 import Global_vars as glob
 from Global_vars import KITS_DB_CSV_PATH
@@ -92,7 +93,7 @@ def classify(obj_sizes: list, ref_sizes: list) -> Tuple[list, list]:
 
     return (objects, hist)
 
-#------------------
+
 def send_alert_email(kit_type:str, kit_num:int):
     kit_num = str(kit_num)
     email_pass : str = 'Robocop22'
@@ -109,14 +110,52 @@ def send_alert_email(kit_type:str, kit_num:int):
     with smtplib.SMTP_SSL('smtp.gmail.com', port) as smtp:
         smtp.login(sender,email_pass)
         smtp.send_message(msg)
-#--------------------
+#END OF FUNCTION send_alert_email()
 
 
-def compare_kits(cmp: list, ref: list, img: vs.Mat, kit_type:str, kit_num:int):
+def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
     if cmp == ref:
         print(f"{bcolors.OKGREEN}Kit OK{bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Passed_Kits")
-        send_alert_email(kit_type,kit_num)
+        send_alert_email(kit_type, kit_num)
+        update_stock(ref)
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Rejected_Kits")
+#END OF FUNCTION compare_kits()
+
+
+def update_stock(ref_kit: dict):
+    in_stock: bool = True
+
+    # List of screws used, to take them off the stock
+    subtracts = []
+    for key in ref_kit:
+        subtracts.append(ref_kit[key])
+
+    # Save the entire file in the 2d list rows
+    with open(KITS_DB_CSV_PATH, 'r', newline="") as f:
+        rows = [] # Entire csv
+        reader = csv.reader(f, delimiter=',')
+        for row in reader:
+            rows.append(row)
+
+    # When opened, the file is erased, but we have its 
+    # contents saved in rows, so we modify those and 
+    # write back rows into the file
+    with open(KITS_DB_CSV_PATH, 'w', newline="") as f:
+        writer = csv.writer(f)
+        screw_index = 0
+        for row in rows:
+            if row[3] != 'Stock':
+                row[3] = str(int(row[3]) - subtracts[screw_index])
+                if int(row[3]) < 0:
+                    row[3] = '0'
+                    in_stock = False
+                screw_index += 1
+                
+        writer.writerows(rows)
+        if not in_stock:
+            raise Exception(f"{bcolors.FAIL}OUT OF STOCK{bcolors.ENDC}")
+#END OF FUNCTION update_stock()
+
