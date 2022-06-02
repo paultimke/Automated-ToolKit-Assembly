@@ -2,10 +2,12 @@ from typing import Tuple
 import pandas as pd
 import Vision as vs
 
+import Global_vars as glob
 from Global_vars import KITS_DB_CSV_PATH
 
 import smtplib, ssl
 from email.mime.text import MIMEText
+from email.message import EmailMessage
 
 
 class bcolors:
@@ -94,24 +96,18 @@ def send_alert_email(kit_type:str, kit_num:int):
     kit_num = str(kit_num)
     email_pass : str = 'Robocop22'
     sender : str = 'modula.vision@gmail.com'
-    receivers : list = ['A01566664@tec.mx','christianloyapena@hotmail.com']
-    port : int = 587
-    
-    context = ssl.create_default_context()
+    receivers : list = glob.EMAIL_RECEIVERS
+    port : int = 465
 
-    with smtplib.SMTP("smtp.gmail.com", port) as smtp:
-        smtp.ehlo()
-        smtp.starttls(context=context)
-        smtp.ehlo()
+    msg =EmailMessage()
+    msg['Subject']='Kit ' + kit_type + ' Terminado'
+    msg['From']= sender
+    msg['To']=receivers[1]
+    msg.set_content('La estación de armado de kits del ModulaLift ha elaborado ' + kit_num + ' veces el kit ' + kit_type)
 
-        smtp.login(sender, email_pass)
-
-        subject = 'Kit ' + kit_type + ' Terminado'
-        body = 'La estacion de armado de kits del ModulaLift ha elaborado ' + kit_num + ' veces el kit ' + kit_type
-
-        message = f'subject: {subject}\n\n{body}'
-        #message = """ felicidades """
-        smtp.sendmail(sender, receivers, message)
+    with smtplib.SMTP_SSL('smtp.gmail.com', port) as smtp:
+        smtp.login(sender,email_pass)
+        smtp.send_message(msg)
 #--------------------
 
 

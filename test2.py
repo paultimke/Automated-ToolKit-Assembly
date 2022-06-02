@@ -1,4 +1,5 @@
 from plc_comm import PLC
+import time
 
 PLC_IP_ADDRESS = "192.168.0.1"
 PLC_RACK = 0
@@ -10,4 +11,8 @@ plc = PLC(PLC_IP_ADDRESS,0,2,2,6)
 
 plc.clearDB()
 
-plc.write_TestInt1(1)
+plc.write_Vision_Result(2)
+
+time.sleep(1)
+
+plc.write_Vision_Result(0)

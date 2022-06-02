@@ -21,9 +21,13 @@ PLC_IP_ADDRESS = "192.168.0.1"
 PLC_RACK = 0
 PLC_RACK_SLOT = 2
 PLC_DATABLOCK = 2
-PLC_DB_SIZE = 6
+PLC_DB_SIZE = 10
 
-# Global variables
+# Email Receivers
+EMAIL_RECEIVERS = ['A01566664@tec.mx','christianloyapena@hotmail.com']
+
+
+# ---------- GLOBAL VARIABLES ---------- #
 Calibration_size : int = None    # Dimensions (length, width) of the reference Calibration object
 
 StartProcess_Btn : ttk.Button = None # Button in UI to start the whole assembly and verification process

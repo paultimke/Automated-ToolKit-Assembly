@@ -27,7 +27,7 @@ class PLC:
         self.__client.db_write(self.__DBnum, 0, self.__DB)
 
     # Data Writing methods
-    def write_TestBool1(self, value: bool) -> None:
+    def write_Start_main_process(self, value: bool) -> None:
         # TestBool1 is bit 0 of Byte 0
         if value:
             self.__DB[0] |= 0x01 # mask to set bit 0
@@ -35,7 +35,7 @@ class PLC:
             self.__DB[0] &= 0xFE # mask to clear bit 0
         self.__client.db_write(self.__DBnum, 0, self.__DB)
 
-    def write_TestBool2(self, value: bool) -> None:
+    def write_Start_vision_cmd(self, value: bool) -> None:
         # TestBool2 is bit 1 of Byte 0
         if value:
             self.__DB[0] |= 0x02 # mask to set bit 1
@@ -43,15 +43,25 @@ class PLC:
             self.__DB[0] &= 0xFD # mask to clear bit 1
         self.__client.db_write(self.__DBnum, 0, self.__DB)
 
-    def write_TestInt1(self, value: int) -> None:
+    def write_Screw_ID(self, value: int) -> None:
         # TestInt1 resides in Bytes 2 and 3, so start offset is 2
         snap7.util.set_int(self.__DB, 2, value)
         self.__client.db_write(self.__DBnum, 2, self.__DB[2:4])
 
-    def write_TestInt2(self, value: int) -> None:
+    def write_kit_ID(self, value: int) -> None:
         # TestInt2 resides in Bytes 4 and 5, so start offset is 4
         snap7.util.set_int(self.__DB, 4, value)
         self.__client.db_write(self.__DBnum, 4, self.__DB[4:6])
+
+    def write_Vision_Result(self, value: int) -> None:
+        # TestInt2 resides in Bytes 6 and 7, so start offset is 6
+        snap7.util.set_int(self.__DB, 6, value)
+        self.__client.db_write(self.__DBnum, 6, self.__DB[6:8])
+
+    def write_Screw_Bandeja(self, value: int) -> None:
+        # TestInt2 resides in Bytes 8 and 9, so start offset is 8
+        snap7.util.set_int(self.__DB, 8, value)
+        self.__client.db_write(self.__DBnum, 8, self.__DB[8:10])
 
     # Data Reading methods
     def read_TestBool1(self) -> bool:
