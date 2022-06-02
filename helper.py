@@ -26,6 +26,7 @@ def create_RefSizesList() -> list:
 
     ref_list = []
     for i in range(len(df.index)):
+        # Column 1 is for length, Column 2 is for width
         ref_list.append((df.iloc[i][1], df.iloc[i][2]))
 
     return ref_list
