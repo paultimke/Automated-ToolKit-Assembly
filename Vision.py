@@ -115,7 +115,7 @@ def RGB2binary(img: Mat) -> Mat:
     #gray scale
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #treshhold over 1st value will covert to 2nd value
-    image_res ,img = cv2.threshold(img,45,255,cv2.THRESH_BINARY)
+    _ ,img = cv2.threshold(img,18,255,cv2.THRESH_BINARY)
     #arreglo chiquito para hacer operaciones morfologicas
     kernel = np.ones((2,2),np.uint8)
     #filtro de morfología abierto
@@ -338,7 +338,7 @@ def img_detectSizes() -> Tuple[Mat, list]:
 
     img = get_image_Vimba()
     img, _ = vimba2binary(img)
-    #img,_ = get_image_from_path("Images\ParaChristian\Ref-img_26cm_31_05_2022__19h-29m-11s.png")
+    #img,_ = get_image_from_path("Images\ParaChristian\Ref-img_26cm_31_05_2022__19h-27m-41s.png")
     #img = RGB2binary(img)
 
     _, contours = count_objects_AnP(img)

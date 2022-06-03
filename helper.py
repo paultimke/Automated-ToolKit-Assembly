@@ -10,6 +10,7 @@ import smtplib, ssl
 from email.mime.text import MIMEText
 from email.message import EmailMessage
 
+OUT_OF_STOCK_ITEMS = []
 
 class bcolors:
     OKGREEN = '\033[92m'
@@ -112,6 +113,30 @@ def send_alert_email(kit_type:str, kit_num:int):
         smtp.send_message(msg)
 #END OF FUNCTION send_alert_email()
 
+def send_Out_of_Stock_email():
+    KitID = ''
+
+    for items in OUT_OF_STOCK_ITEMS:
+        KitID += items + ', '
+    KitID = KitID[:-2]
+
+
+    email_pass : str = 'Robocop22'
+    sender : str = 'modula.vision@gmail.com'
+    receivers : list = glob.EMAIL_RECEIVERS
+    port : int = 465
+
+    msg =EmailMessage()
+    msg['Subject']='Piezas fuera de stock en almacén ModulaLift '
+    msg['From']= sender
+    msg['To']=receivers
+    msg.set_content('La(s) pieza(s)  ' + KitID + ' se ha(n) agotado en el sistema de almacenaje ModulaLift. \n Favor de actualizar el inventario disponible lo antes posible')
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', port) as smtp:
+        smtp.login(sender,email_pass)
+        smtp.send_message(msg)
+#END OF FUNCTION send_Out_of_Stock_email()
+
 
 def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
     if cmp == ref:
@@ -119,6 +144,7 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
         vs.save_image(img, "Test", "Images/Passed_Kits")
         send_alert_email(kit_type, kit_num)
         update_stock(ref)
+        
 
         glob.plc.write_Vision_Result(1)
     else:
@@ -127,6 +153,8 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
 
         glob.plc.write_Vision_Result(2)
         glob.plc.write_Screw_ID(2)
+        # hay que actualizar write_Screw_bandeja para que sea dependiendo del 
+        # tornillo faltante 
         glob.plc.write_Screw_Bandeja(1)
 #END OF FUNCTION compare_kits()
 
@@ -158,10 +186,13 @@ def update_stock(ref_kit: dict):
                 if int(row[3]) < 0:
                     row[3] = '0'
                     in_stock = False
+                    OUT_OF_STOCK_ITEMS.append(row[0])
                 screw_index += 1
                 
         writer.writerows(rows)
         if not in_stock:
+            send_Out_of_Stock_email()
             raise Exception(f"{bcolors.FAIL}OUT OF STOCK{bcolors.ENDC}")
+
 #END OF FUNCTION update_stock()
 
