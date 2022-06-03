@@ -181,7 +181,7 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		# Send Commands to Robot and Conveyor PLC to start Assembly
 		DESIRED_KIT_NAME   : str = self.lista_fin[0]
 		DESIRED_ITERATIONS : int = self.lista_fin[1]
-		#main.Start_Assembly(DESIRED_KIT_NAME, DESIRED_ITERATIONS)
+		main.Start_Assembly(DESIRED_KIT_NAME, DESIRED_ITERATIONS)
 
 		# Takes an image of the assembled kit and verifies it for correctness
 		main.Verify_Kit(ref_kit,DESIRED_KIT_NAME,DESIRED_ITERATIONS)

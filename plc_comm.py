@@ -64,20 +64,9 @@ class PLC:
         self.__client.db_write(self.__DBnum, 8, self.__DB[8:10])
 
     # Data Reading methods
-    def read_TestBool1(self) -> bool:
-        self.__DB = self.__client.db_get(self.__DBnum)
-        return snap7.util.get_bool(self.__DB, 0, 0)
-
-    def read_TestBool2(self) -> bool:
+    def read_Start_vision_cmd(self) -> bool:
         self.__DB = self.__client.db_get(self.__DBnum)
         return snap7.util.get_bool(self.__DB, 0, 1)
 
-    def read_TestInt1(self) -> int:
-        self.__DB = self.__client.db_get(self.__DBnum)
-        return snap7.util.get_int(self.__DB, 2)
-
-    def read_TestInt2(self) -> int:
-        self.__DB = self.__client.db_get(self.__DBnum)
-        return snap7.util.get_int(self.__DB, 4)
 
 

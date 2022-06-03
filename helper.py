@@ -104,7 +104,7 @@ def send_alert_email(kit_type:str, kit_num:int):
     msg =EmailMessage()
     msg['Subject']='Kit ' + kit_type + ' Terminado'
     msg['From']= sender
-    msg['To']=receivers[1]
+    msg['To']=receivers
     msg.set_content('La estación de armado de kits del ModulaLift ha elaborado ' + kit_num + ' veces el kit ' + kit_type)
 
     with smtplib.SMTP_SSL('smtp.gmail.com', port) as smtp:
@@ -119,9 +119,15 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
         vs.save_image(img, "Test", "Images/Passed_Kits")
         send_alert_email(kit_type, kit_num)
         update_stock(ref)
+
+        glob.plc.write_Vision_Result(1)
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Rejected_Kits")
+
+        glob.plc.write_Vision_Result(2)
+        glob.plc.write_Screw_ID(2)
+        glob.plc.write_Screw_Bandeja(1)
 #END OF FUNCTION compare_kits()
 
 

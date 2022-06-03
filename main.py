@@ -7,7 +7,7 @@ import main_UI as UI
 import Global_vars as glob
 
 # Debug Flag to use the PLC DataBlock Simulator
-USING_PLC_DUMMY = True
+USING_PLC_DUMMY = False
 if not USING_PLC_DUMMY:
     from Global_vars import PLC_IP_ADDRESS, PLC_RACK, PLC_RACK_SLOT, PLC_DATABLOCK, PLC_DB_SIZE
 
@@ -48,22 +48,22 @@ def Start_Assembly(kit: str, iterations: int) -> None:
     @return -> None
     """
     # Clear all previous Flags
+    glob.plc = plc_comm.PLC(PLC_IP_ADDRESS, PLC_RACK, PLC_RACK_SLOT, 
+                                PLC_DATABLOCK, PLC_DB_SIZE)
     glob.plc.clearDB()
+    time.sleep(1)
 
-    while(glob.plc.read_TestBool1() == False):
-        print("On Idle")
-        time.sleep(1)
+    # Mandar un pulso de 1 segundo para empezar proceso en PLC
+    glob.plc.write_Start_main_process(True)
+    time.sleep(1)
+    glob.plc.write_Start_main_process(False)
 
-    print("Loop broken")
-    print("Now doing more stuff")
+    glob.plc.write_kit_ID(1)
 
-    while(glob.plc.read_TestBool2() == False):
-        print("On idle again")
-        time.sleep(1)
-
-    print("Condition passed again. Loop broken")
-    print("Now doing more stuff again")
-
+    # Espera hasta que PLC termine para empezar Vision
+    while(glob.plc.read_Start_vision_cmd() == False):
+        pass
+    #glob.plc.write_Start_vision_cmd(False)
 #END OF FUNCTION Start_Assembly()
 
 def Verify_Kit(ref_kit : dict, kit_type:str, kit_num:int) -> None:
