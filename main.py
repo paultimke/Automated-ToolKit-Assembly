@@ -40,6 +40,7 @@ def Start_Assembly(kit: str, iterations: int) -> None:
     """
     # Hardware Setup
     plc = helper.connect_to_plc()
+    plc.clearDB()
     time.sleep(1)
 
     # Mandar un pulso de 1 segundo para empezar proceso en PLC
@@ -51,6 +52,7 @@ def Start_Assembly(kit: str, iterations: int) -> None:
 
     # Espera hasta que PLC termine para empezar Vision
     while(plc.read_Start_vision_cmd() == False):
+        time.sleep(0.1)
         pass
     #plc.write_Start_vision_cmd(False)
 #END OF FUNCTION Start_Assembly()
