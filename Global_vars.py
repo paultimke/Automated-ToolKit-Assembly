@@ -29,5 +29,3 @@ EMAIL_RECEIVERS = ['ptimkec@live.com']  # polo: A01562062@tec.mx
 Calibration_size : int = None    # Dimensions (length, width) of the reference Calibration object
 
 StartProcess_Btn : ttk.Button = None # Button in UI to start the whole assembly and verification process
-
-plc = None # PLC object, must be initialized either with plc_comm.PLC() or plc_dummy.PLC()

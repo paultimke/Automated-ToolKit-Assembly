@@ -336,10 +336,10 @@ def img_detectSizes() -> Tuple[Mat, list]:
     """
     ref_size = glob.Calibration_size
 
-    img = get_image_Vimba()
-    img, _ = vimba2binary(img)
-    #img,_ = get_image_from_path("Images\ParaChristian\Ref-img_26cm_31_05_2022__19h-27m-41s.png")
-    #img = RGB2binary(img)
+    #img = get_image_Vimba()
+    #img, _ = vimba2binary(img)
+    img,_ = get_image_from_path("Images/ParaChristian/Ref-img_26cm_31_05_2022__19h-27m-41s.png")
+    img = RGB2binary(img)
 
     _, contours = count_objects_AnP(img)
     img, sizes = measure_objects(img, contours, ref_size)

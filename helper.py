@@ -1,4 +1,3 @@
-from pydoc import visiblename
 from typing import Tuple
 import enum
 import main
@@ -12,8 +11,7 @@ import plc_comm
 import Global_vars as glob
 from Global_vars import KITS_DB_CSV_PATH
 
-import smtplib, ssl
-from email.mime.text import MIMEText
+import smtplib 
 from email.message import EmailMessage
 
 OUT_OF_STOCK_ITEMS = []
@@ -27,11 +25,6 @@ class Vision_Result(enum.Enum):
     waiting = 0
     Kit_OK = 1
     Kit_FAIL = 2
-
-class Screw_Bandeja(enum.Enum):
-    no_screw = 0
-    Bandeja_1 = 1
-    Bandeja_2 = 2
 
 
 def create_RefSizesList() -> list:
@@ -164,16 +157,38 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
         send_alert_email(kit_type, kit_num)
         update_stock(ref)
         plc.write_Vision_Result(Vision_Result.Kit_OK.value)
+
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Rejected_Kits")
 
+        (screw_id, tray_id) = find_missing_screw(cmp, ref)
+
         plc.write_Vision_Result(Vision_Result.Kit_FAIL.value)
-        plc.write_Screw_ID(2)
-        # hay que actualizar write_Screw_bandeja para que sea dependiendo del 
-        # tornillo faltante 
-        plc.write_Screw_Bandeja(Screw_Bandeja.Bandeja_1.value)
+        plc.write_Screw_ID(screw_id)
+        plc.write_Screw_Bandeja(tray_id)
 #END OF FUNCTION compare_kits()
+
+def find_missing_screw(cmp: dict, ref: dict) -> Tuple[int, int]:
+    SCREW_ID_CSV_COL = 5
+    TRAY_ID_CSV_COL  = 4
+
+    df = pd.read_csv(KITS_DB_CSV_PATH)
+    missing : int = None
+    Screw_ID: int = None
+    Tray_ID:  int = None
+
+    for key in ref:
+        if(cmp[key] < ref[key]):
+            missing = key # Only returns the last missing
+
+    for row in range(len(df.index)):
+        if(df.iloc[row][0]) == missing:
+            Screw_ID = df.iloc[row][SCREW_ID_CSV_COL]
+            Tray_ID = df.iloc[row][TRAY_ID_CSV_COL]
+
+    return (Screw_ID, Tray_ID)
+#END OF FUNCTION find_missing_screw()
 
 def update_stock(ref_kit: dict):
     in_stock: bool = True
@@ -224,3 +239,5 @@ def connect_to_plc():
 
     return plc
 #END OF FUNCTION connect_to_plc()
+
+
