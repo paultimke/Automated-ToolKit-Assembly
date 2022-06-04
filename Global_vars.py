@@ -1,5 +1,3 @@
-import PLC_sim.plc_dummy as plc_dummy
-import plc_comm
 from tkinter import ttk
 
 # ---------- CONSTANTS ---------- #
@@ -24,7 +22,7 @@ PLC_DATABLOCK = 2
 PLC_DB_SIZE = 10
 
 # Email Receivers
-EMAIL_RECEIVERS = ['A01566664@tec.mx']  # polo: A01562062@tec.mx
+EMAIL_RECEIVERS = ['ptimkec@live.com']  # polo: A01562062@tec.mx
 
 
 # ---------- GLOBAL VARIABLES ---------- #

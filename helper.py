@@ -1,7 +1,13 @@
+from pydoc import visiblename
 from typing import Tuple
+import enum
+import main
 import pandas as pd
 import Vision as vs
 import csv
+
+from PLC_sim import plc_dummy
+import plc_comm
 
 import Global_vars as glob
 from Global_vars import KITS_DB_CSV_PATH
@@ -16,6 +22,17 @@ class bcolors:
     OKGREEN = '\033[92m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
+
+class Vision_Result(enum.Enum):
+    waiting = 0
+    Kit_OK = 1
+    Kit_FAIL = 2
+
+class Screw_Bandeja(enum.Enum):
+    no_screw = 0
+    Bandeja_1 = 1
+    Bandeja_2 = 2
+
 
 def create_RefSizesList() -> list:
     """ Create Reference Sizes List function.
@@ -139,25 +156,24 @@ def send_Out_of_Stock_email():
 
 
 def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
+    plc = connect_to_plc()
+
     if cmp == ref:
         print(f"{bcolors.OKGREEN}Kit OK{bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Passed_Kits")
         send_alert_email(kit_type, kit_num)
         update_stock(ref)
-        
-
-        glob.plc.write_Vision_Result(1)
+        plc.write_Vision_Result(Vision_Result.Kit_OK.value)
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Rejected_Kits")
 
-        glob.plc.write_Vision_Result(2)
-        glob.plc.write_Screw_ID(2)
+        plc.write_Vision_Result(Vision_Result.Kit_FAIL.value)
+        plc.write_Screw_ID(2)
         # hay que actualizar write_Screw_bandeja para que sea dependiendo del 
         # tornillo faltante 
-        glob.plc.write_Screw_Bandeja(1)
+        plc.write_Screw_Bandeja(Screw_Bandeja.Bandeja_1.value)
 #END OF FUNCTION compare_kits()
-
 
 def update_stock(ref_kit: dict):
     in_stock: bool = True
@@ -193,6 +209,18 @@ def update_stock(ref_kit: dict):
         if not in_stock:
             send_Out_of_Stock_email()
             raise Exception(f"{bcolors.FAIL}OUT OF STOCK{bcolors.ENDC}")
-
 #END OF FUNCTION update_stock()
 
+def connect_to_plc():
+    # Hardware Setup
+    if main.USING_PLC_DUMMY:
+        plc = plc_dummy.PLC(10)
+    else:
+        from Global_vars import (PLC_IP_ADDRESS, PLC_RACK, PLC_RACK_SLOT, 
+                                PLC_DATABLOCK, PLC_DB_SIZE)
+
+        plc = plc_comm.PLC(PLC_IP_ADDRESS, PLC_RACK, PLC_RACK_SLOT, 
+                                PLC_DATABLOCK, PLC_DB_SIZE)
+
+    return plc
+#END OF FUNCTION connect_to_plc()

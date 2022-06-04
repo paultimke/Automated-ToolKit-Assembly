@@ -1,13 +1,11 @@
-import PLC_sim.plc_dummy as plc_dummy
-import plc_comm
-import helper
 import time
 import Vision as vs
 import main_UI as UI
 import Global_vars as glob
+import helper
 
 # Debug Flag to use the PLC DataBlock Simulator
-USING_PLC_DUMMY = False
+USING_PLC_DUMMY = True
 if not USING_PLC_DUMMY:
     from Global_vars import PLC_IP_ADDRESS, PLC_RACK, PLC_RACK_SLOT, PLC_DATABLOCK, PLC_DB_SIZE
 
@@ -21,19 +19,12 @@ def setup() -> None:
 
     @return -> None
     """
-
-    # Hardware Setup
-    if USING_PLC_DUMMY:
-        glob.plc = plc_dummy.PLC(6)
-        glob.plc.clearDB()
-    else:
-        glob.plc = plc_comm.PLC(PLC_IP_ADDRESS, PLC_RACK, PLC_RACK_SLOT, 
-                                PLC_DATABLOCK, PLC_DB_SIZE)
-        glob.plc.clearDB()
+    # Clear all on PLC DataBlock
+    plc = helper.connect_to_plc()
+    plc.clearDB()
 
     # Calibrate camera
     glob.Calibration_size = vs.calibrate_cam(glob.REF_IMG_PATH, glob.REF_OBJ_SIZE)
-
 # END OF FUNCTION setup()
 
 def Start_Assembly(kit: str, iterations: int) -> None:
@@ -47,23 +38,21 @@ def Start_Assembly(kit: str, iterations: int) -> None:
 
     @return -> None
     """
-    # Clear all previous Flags
-    glob.plc = plc_comm.PLC(PLC_IP_ADDRESS, PLC_RACK, PLC_RACK_SLOT, 
-                                PLC_DATABLOCK, PLC_DB_SIZE)
-    glob.plc.clearDB()
+    # Hardware Setup
+    plc = helper.connect_to_plc()
     time.sleep(1)
 
     # Mandar un pulso de 1 segundo para empezar proceso en PLC
-    glob.plc.write_Start_main_process(True)
+    plc.write_Start_main_process(True)
     time.sleep(1)
-    glob.plc.write_Start_main_process(False)
+    plc.write_Start_main_process(False)
 
-    glob.plc.write_kit_ID(1)
+    plc.write_Kit_ID(1)
 
     # Espera hasta que PLC termine para empezar Vision
-    while(glob.plc.read_Start_vision_cmd() == False):
+    while(plc.read_Start_vision_cmd() == False):
         pass
-    #glob.plc.write_Start_vision_cmd(False)
+    #plc.write_Start_vision_cmd(False)
 #END OF FUNCTION Start_Assembly()
 
 def Verify_Kit(ref_kit : dict, kit_type:str, kit_num:int) -> None:
