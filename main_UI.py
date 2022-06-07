@@ -17,7 +17,7 @@ class Registro_kits(tk.Toplevel):#***************** VENTANA DE REGISTRO DE KITS 
 		super().__init__(parent)
 
 		#Caracteristicas de la ventana
-		self.title("Registro de kits (Nombre temporal)")
+		self.title("Registro de kits")
 		self.configure(bg = global_vars.UI_BACKGROUND_COLOR)
 
 		#Frames de trabajo
@@ -103,7 +103,7 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		super().__init__()
 
 		#Caracteristicas de la ventana
-		self.title("Selector de kits (Nombre temporal)")
+		self.title("Selector de kits")
 		self.configure(bg = global_vars.UI_BACKGROUND_COLOR)
 
 		#Frames de trabajo

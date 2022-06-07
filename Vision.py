@@ -136,7 +136,7 @@ def vimba2binary(img) ->Mat:
     it into a binary array 
     @img parameter image (3 dimensions Mat) - Vimba Frame"""
 
-    THRESHOLD = 17
+    THRESHOLD = 38
 
     # 12:00 pm - THRESHOLD = 60
     # 4:00 pm -THRESHOLD = 50
@@ -336,10 +336,10 @@ def img_detectSizes() -> Tuple[Mat, list]:
     """
     ref_size = glob.Calibration_size
 
-    #img = get_image_Vimba()
-    #img, _ = vimba2binary(img)
-    img,_ = get_image_from_path("Images/ParaChristian/Ref-img_26cm_31_05_2022__19h-27m-41s.png")
-    img = RGB2binary(img)
+    img = get_image_Vimba()
+    img, _ = vimba2binary(img)
+    #img,_ = get_image_from_path("Images/ParaChristian/Ref-img_26cm_31_05_2022__19h-27m-41s.png")
+    #img = RGB2binary(img)
 
     _, contours = count_objects_AnP(img)
     img, sizes = measure_objects(img, contours, ref_size)
