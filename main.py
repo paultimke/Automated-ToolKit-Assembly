@@ -5,7 +5,7 @@ import Global_vars as glob
 import helper
 
 # Debug Flag to use the PLC DataBlock Simulator
-USING_PLC_DUMMY = True
+USING_PLC_DUMMY = False
 if not USING_PLC_DUMMY:
     from Global_vars import PLC_IP_ADDRESS, PLC_RACK, PLC_RACK_SLOT, PLC_DATABLOCK, PLC_DB_SIZE
 
@@ -51,7 +51,7 @@ def Start_Assembly(kit: str, iterations: int) -> None:
     # Por mientras, solo se manda un int de cual kit quieres, pero
     # todavia no es flexible para crear kits y armarlos, solo se puede
     # con kits existentes y que ya esten programados en robot
-    plc.write_Kit_ID(1)
+    plc.write_kit_ID(1)
 
     # Espera hasta que PLC termine para empezar Vision
     while(plc.read_Start_vision_cmd() == False):
