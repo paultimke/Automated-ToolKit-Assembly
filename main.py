@@ -51,12 +51,7 @@ def Start_Assembly(kit: str, iterations: int) -> None:
     # Por mientras, solo se manda un int de cual kit quieres, pero
     # todavia no es flexible para crear kits y armarlos, solo se puede
     # con kits existentes y que ya esten programados en robot
-    plc.write_kit_ID(1)
-
-    # Espera hasta que PLC termine para empezar Vision
-    while(plc.read_Start_vision_cmd() == False):
-        time.sleep(0.1)
-        pass
+    plc.write_Kit_ID(1)
 
 #END OF FUNCTION Start_Assembly()
 
@@ -69,10 +64,11 @@ def Verify_Kit(ref_kit : dict, kit_type:str, kit_num:int) -> None:
     img, sizes = vs.img_detectSizes()      
     _, assembled_kit = helper.classify(sizes, ref_sizes)
 
-    helper.compare_kits(assembled_kit, ref_kit, img, kit_type, kit_num)
-    
+    kit_ok = helper.compare_kits(assembled_kit, ref_kit, img, kit_type, kit_num)
 
     print(f"Current kit = {assembled_kit}")
+
+    return kit_ok
 #END OF FUNCTION Verify_Kit()
 
 

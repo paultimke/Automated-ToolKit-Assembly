@@ -5,6 +5,7 @@ from turtle import bgcolor
 import pandas as pd
 import csv 
 
+import time
 import helper
 import main
 import Global_vars as global_vars
@@ -163,6 +164,8 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		# Disable Button during Process to avoid multiple requests until process is done
 		global_vars.StartProcess_Btn.grid_forget()
 
+		plc = helper.connect_to_plc()
+
 		# Collect the kit information from the User Interface
 		for x in range(0,len(self.bigdata)):
 			if self.bigdata[x][0] == self.seleccion.get():
@@ -183,8 +186,16 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		DESIRED_ITERATIONS : int = self.lista_fin[1]
 		main.Start_Assembly(DESIRED_KIT_NAME, DESIRED_ITERATIONS)
 
+		# Espera hasta que PLC termine para empezar Vision
+		kit_ok = False
+		while(plc.read_Start_vision_cmd() == True or not kit_ok):
+			if plc.read_Start_vision_cmd():
+				kit_ok = main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
+			time.sleep(0.2)
+
+
 		# Takes an image of the assembled kit and verifies it for correctness
-		main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
+		
 
 		print(f"Ref kit: {self.lista_fin}")
 

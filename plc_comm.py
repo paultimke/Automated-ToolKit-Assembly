@@ -48,7 +48,7 @@ class PLC:
         snap7.util.set_int(self.__DB, 2, value)
         self.__client.db_write(self.__DBnum, 2, self.__DB[2:4])
 
-    def write_kit_ID(self, value: int) -> None:
+    def write_Kit_ID(self, value: int) -> None:
         # Kit_ID resides in Bytes 4 and 5, so start offset is 4
         snap7.util.set_int(self.__DB, 4, value)
         self.__client.db_write(self.__DBnum, 4, self.__DB[4:6])

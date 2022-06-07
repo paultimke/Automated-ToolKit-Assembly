@@ -5,6 +5,7 @@ import pandas as pd
 import Vision as vs
 import csv
 
+import time
 from PLC_sim import plc_dummy
 import plc_comm
 
@@ -143,8 +144,13 @@ def send_Out_of_Stock_email():
     msg.set_content('La(s) pieza(s)  ' + KitID + ' se ha(n) agotado en el sistema de almacenaje ModulaLift. \n Favor de actualizar el inventario disponible lo antes posible')
 
     with smtplib.SMTP_SSL('smtp.gmail.com', port) as smtp:
-        smtp.login(sender,email_pass)
-        smtp.send_message(msg)
+        try:
+            smtp.login(sender,email_pass)
+            smtp.send_message(msg)
+            return 0
+        except:
+            print("Failed to send email")
+            return 1
 #END OF FUNCTION send_Out_of_Stock_email()
 
 
@@ -154,10 +160,11 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
     if cmp == ref:
         print(f"{bcolors.OKGREEN}Kit OK{bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Passed_Kits")
-        send_alert_email(kit_type, kit_num)
+        #send_alert_email(kit_type, kit_num)
         update_stock(ref)
         plc.write_Vision_Result(Vision_Result.Kit_OK.value)
 
+        return True
     else:
         print(f"{bcolors.FAIL}Kit FAILED {bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Rejected_Kits")
@@ -167,6 +174,10 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
         plc.write_Vision_Result(Vision_Result.Kit_FAIL.value)
         plc.write_Screw_ID(screw_id)
         plc.write_Screw_Bandeja(tray_id)
+        time.sleep(0.5)
+        plc.write_Vision_Result(Vision_Result.waiting.value)
+
+        return False
 #END OF FUNCTION compare_kits()
 
 def find_missing_screw(cmp: dict, ref: dict) -> Tuple[int, int]:
