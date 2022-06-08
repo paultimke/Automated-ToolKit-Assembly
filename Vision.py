@@ -136,9 +136,9 @@ def vimba2binary(img) ->Mat:
     it into a binary array 
     @img parameter image (3 dimensions Mat) - Vimba Frame"""
 
-    THRESHOLD = 40
+    THRESHOLD = 55
 
-    # 12:00 pm - THRESHOLD = 60
+    # 10:00 am - 12:00 pm - THRESHOLD = 64
     # 4:00 pm -THRESHOLD = 50
     # 5:30 pm - TRESHOLD = 50
     # 7:00 pm - THRESHOLD = 15

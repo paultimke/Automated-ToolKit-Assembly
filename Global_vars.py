@@ -19,7 +19,7 @@ PLC_IP_ADDRESS = "192.168.0.1"
 PLC_RACK = 0
 PLC_RACK_SLOT = 2
 PLC_DATABLOCK = 2
-PLC_DB_SIZE = 10
+PLC_DB_SIZE = 18
 
 # Email Receivers
 EMAIL_RECEIVERS = ['ptimkec@live.com']  # polo: A01562062@tec.mx

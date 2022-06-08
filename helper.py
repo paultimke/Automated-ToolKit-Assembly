@@ -171,9 +171,13 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
 
         (screw_id, tray_id) = find_missing_screw(cmp, ref)
 
+        if(screw_id == None):
+            print("Problemas con Vision. Checar iluminacion")
+        else:
+            plc.write_Screw_ID(screw_id)
+            plc.write_Screw_Bandeja(tray_id)
+
         plc.write_Vision_Result(Vision_Result.Kit_FAIL.value)
-        plc.write_Screw_ID(screw_id)
-        plc.write_Screw_Bandeja(tray_id)
         time.sleep(0.5)
         plc.write_Vision_Result(Vision_Result.waiting.value)
 

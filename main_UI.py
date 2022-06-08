@@ -184,23 +184,21 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		# Send Commands to Robot and Conveyor PLC to start Assembly
 		DESIRED_KIT_NAME   : str = self.lista_fin[0]
 		DESIRED_ITERATIONS : int = self.lista_fin[1]
-		main.Start_Assembly(DESIRED_KIT_NAME, DESIRED_ITERATIONS)
 
-		# Espera hasta que PLC termine para empezar Vision
-		kit_ok = False
-		while(plc.read_Start_vision_cmd() == True or not kit_ok):
-			if plc.read_Start_vision_cmd():
-				kit_ok = main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
-			time.sleep(0.2)
+		for _ in range (DESIRED_ITERATIONS):
+			main.Start_Assembly(DESIRED_KIT_NAME, ref_kit)
+
+			# Espera hasta que PLC termine para empezar Vision
+			kit_ok = False
+			while(plc.read_Start_vision_cmd() == True or not kit_ok):
+				if plc.read_Start_vision_cmd():
+					kit_ok = main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
+				time.sleep(0.2) 
 
 		# Para pruebas de vision. Usar linea de abajo y comentar lo de arriba
 		#main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
 
-
-		# Takes an image of the assembled kit and verifies it for correctness
-		
-
-		print(f"Ref kit: {self.lista_fin}")
+			print(f"Ref kit: {self.lista_fin}")
 
 		# Process is done, now we can enable the Button again
 		global_vars.StartProcess_Btn.grid(column=4, row=1)
