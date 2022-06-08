@@ -193,6 +193,9 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 				kit_ok = main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
 			time.sleep(0.2)
 
+		# Para pruebas de vision. Usar linea de abajo y comentar lo de arriba
+		#main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
+
 
 		# Takes an image of the assembled kit and verifies it for correctness
 		

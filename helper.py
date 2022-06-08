@@ -99,7 +99,7 @@ def classify(obj_sizes: list, ref_sizes: list) -> Tuple[list, list]:
     # Classify each object and make a histogram of each type
     for screw in range(n_screws):
         for id in range(n_types):
-            if is_inRange(obj_sizes[screw], ref_sizes[id], 0.25):
+            if is_inRange(obj_sizes[screw], ref_sizes[id], 0.28):
                 objects.append((screw, IDs[id]))
                 hist[IDs[id]] += 1
 
