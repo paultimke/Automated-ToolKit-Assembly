@@ -27,7 +27,7 @@ def setup() -> None:
     glob.Calibration_size = vs.calibrate_cam(glob.REF_IMG_PATH, glob.REF_OBJ_SIZE)
 # END OF FUNCTION setup()
 
-def Start_Assembly(kit: str, iterations: int) -> None:
+def Start_Assembly(kit: dict, iterations: int) -> None:
     """
     Start Assembly Function
     This function starts the assembly process by sending commands to the 
@@ -52,6 +52,9 @@ def Start_Assembly(kit: str, iterations: int) -> None:
     # todavia no es flexible para crear kits y armarlos, solo se puede
     # con kits existentes y que ya esten programados en robot
     plc.write_Kit_ID(1)
+
+    #for i in range(4):
+    #   plc.write_Screw(screwID, cuantos)
 
 #END OF FUNCTION Start_Assembly()
 
