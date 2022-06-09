@@ -12,8 +12,9 @@ import plc_comm
 import Global_vars as glob
 from Global_vars import KITS_DB_CSV_PATH
 
-import smtplib 
+import smtplib, ssl
 from email.message import EmailMessage
+import win32com.client as win32
 
 OUT_OF_STOCK_ITEMS = []
 
@@ -82,7 +83,7 @@ def is_inRange(val: tuple, ref: tuple, precision: float) -> bool:
     return (exp1 or exp2)
 
 
-def classify(obj_sizes: list, ref_sizes: list) -> Tuple[list, list]:
+def classify(obj_sizes: list, ref_sizes: list, perimeters: list) -> Tuple[list, list]:
     df = pd.read_csv(KITS_DB_CSV_PATH) # DataFrame with the reference sizes of screws
     n_screws = len(obj_sizes) # Number of objects detected
     n_types = len(df.index)   # Number of different types of screws
@@ -99,29 +100,44 @@ def classify(obj_sizes: list, ref_sizes: list) -> Tuple[list, list]:
     # Classify each object and make a histogram of each type
     for screw in range(n_screws):
         for id in range(n_types):
-            if is_inRange(obj_sizes[screw], ref_sizes[id], 0.28):
-                objects.append((screw, IDs[id]))
-                hist[IDs[id]] += 1
+            if is_inRange(obj_sizes[screw], ref_sizes[id], 0.40):
+                if IDs[id] == 'mediano' or IDs[id] == 'tuerca':
+                    if perimeters[screw] < 149 :
+                        objects.append((screw, 'tuerca'))
+                        hist['tuerca'] += 1
+                        break
+                    else :
+                        objects.append((screw, 'mediano'))
+                        hist['mediano'] += 1
+                        break
+                else: 
+                    objects.append((screw, IDs[id]))
+                    hist[IDs[id]] += 1
+                    break
 
     return (objects, hist)
 
 
 def send_alert_email(kit_type:str, kit_num:int):
     kit_num = str(kit_num)
-    email_pass : str = 'Robocop22'
-    sender : str = 'modula.vision@gmail.com'
     receivers : list = glob.EMAIL_RECEIVERS
-    port : int = 465
+    
+    outlook = win32.Dispatch('outlook.application')
+    mail = outlook.CreateItem(0)
+    mail.To = receivers[0]
+    mail.CC=receivers[1]
+    message = 'La estación de armado de kits del ModulaLift ha elaborado ' + kit_num + ' veces el kit ' + kit_type
+    mail.Subject = 'Kit'  + kit_type + 'Terminado'
+    mail.Body = message
+    #mail.HTMLBody = '<h2>HTML Message body</h2>' #this field is optional
 
-    msg =EmailMessage()
-    msg['Subject']='Kit ' + kit_type + ' Terminado'
-    msg['From']= sender
-    msg['To']=receivers
-    msg.set_content('La estación de armado de kits del ModulaLift ha elaborado ' + kit_num + ' veces el kit ' + kit_type)
-
-    with smtplib.SMTP_SSL('smtp.gmail.com', port) as smtp:
-        smtp.login(sender,email_pass)
-        smtp.send_message(msg)
+    # To attach a file to the email (optional):
+    #attachment  = "Path to the attachment"
+    #mail.Attachments.Add(attachment)
+    try: 
+        mail.Send() 
+    except:
+        print("Error: No se envio correo")           
 #END OF FUNCTION send_alert_email()
 
 def send_Out_of_Stock_email():
@@ -131,26 +147,25 @@ def send_Out_of_Stock_email():
         KitID += items + ', '
     KitID = KitID[:-2]
 
-
-    email_pass : str = 'Robocop22'
-    sender : str = 'modula.vision@gmail.com'
     receivers : list = glob.EMAIL_RECEIVERS
-    port : int = 465
+    
+    outlook = win32.Dispatch('outlook.application')
+    mail = outlook.CreateItem(0)
+    mail.To = receivers[0]
+    mail.CC=receivers[1]
+    message = 'La(s) pieza(s)  ' + KitID + ' se ha(n) agotado en el sistema de almacenaje ModulaLift. \n Favor de actualizar el inventario disponible lo antes posible'
+    mail.Subject = 'Piezas fuera de stock en almacén ModulaLift '
+    mail.Body = message
+    #mail.HTMLBody = '<h2>HTML Message body</h2>' #this field is optional
 
-    msg =EmailMessage()
-    msg['Subject']='Piezas fuera de stock en almacén ModulaLift '
-    msg['From']= sender
-    msg['To']=receivers
-    msg.set_content('La(s) pieza(s)  ' + KitID + ' se ha(n) agotado en el sistema de almacenaje ModulaLift. \n Favor de actualizar el inventario disponible lo antes posible')
+    # To attach a file to the email (optional):
+    #attachment  = "Path to the attachment"
+    #mail.Attachments.Add(attachment)
+    try: 
+        mail.Send() 
+    except:
+        print("Error: No se envio correo")
 
-    with smtplib.SMTP_SSL('smtp.gmail.com', port) as smtp:
-        try:
-            smtp.login(sender,email_pass)
-            smtp.send_message(msg)
-            return 0
-        except:
-            print("Failed to send email")
-            return 1
 #END OF FUNCTION send_Out_of_Stock_email()
 
 
@@ -160,7 +175,7 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
     if cmp == ref:
         print(f"{bcolors.OKGREEN}Kit OK{bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Passed_Kits")
-        #send_alert_email(kit_type, kit_num)
+        send_alert_email(kit_type, kit_num)
         update_stock(ref)
         plc.write_Vision_Result(Vision_Result.Kit_OK.value)
 
@@ -229,7 +244,7 @@ def update_stock(ref_kit: dict):
         for row in rows:
             if row[3] != 'Stock':
                 row[3] = str(int(row[3]) - subtracts[screw_index])
-                if int(row[3]) < 0:
+                if int(row[3]) <= 0:
                     row[3] = '0'
                     in_stock = False
                     OUT_OF_STOCK_ITEMS.append(row[0])
@@ -238,7 +253,7 @@ def update_stock(ref_kit: dict):
         writer.writerows(rows)
         if not in_stock:
             send_Out_of_Stock_email()
-            raise Exception(f"{bcolors.FAIL}OUT OF STOCK{bcolors.ENDC}")
+            #raise Exception(f"{bcolors.FAIL}OUT OF STOCK{bcolors.ENDC}")
 #END OF FUNCTION update_stock()
 
 def connect_to_plc():

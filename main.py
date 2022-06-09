@@ -71,8 +71,8 @@ def Verify_Kit(ref_kit : dict, kit_type:str, kit_num:int) -> None:
     ref_sizes = helper.create_RefSizesList()
 
     # Take image, process and classify
-    img, sizes = vs.img_detectSizes()      
-    _, assembled_kit = helper.classify(sizes, ref_sizes)
+    img, sizes, perims = vs.img_detectSizes()      
+    _, assembled_kit = helper.classify(sizes, ref_sizes, perims)
 
     kit_ok = helper.compare_kits(assembled_kit, ref_kit, img, kit_type, kit_num)
 

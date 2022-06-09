@@ -22,7 +22,7 @@ PLC_DATABLOCK = 2
 PLC_DB_SIZE = 18
 
 # Email Receivers
-EMAIL_RECEIVERS = ['ptimkec@live.com']  # polo: A01562062@tec.mx
+EMAIL_RECEIVERS = ['ptimkec@live.com', 'A01566759@tec.mx']  # polo: A01562062@tec.mx
 
 
 # ---------- GLOBAL VARIABLES ---------- #
