@@ -18,7 +18,7 @@ except:
     pass
 
 # CONSTANTS
-DEBUG = True
+DEBUG = False
 
 
 def get_image_from_path(path:str) -> None:
@@ -136,7 +136,7 @@ def vimba2binary(img) ->Mat:
     it into a binary array 
     @img parameter image (3 dimensions Mat) - Vimba Frame"""
 
-    THRESHOLD = 40
+    THRESHOLD = 60
 
     # 10:00 am - 12:00 pm - THRESHOLD = 64
     # 4:00 pm -THRESHOLD = 50

@@ -1,5 +1,8 @@
+from logging import exception
 from typing import Tuple
 import enum
+
+#import pywhatkit as wpp
 import main
 import pandas as pd
 import Vision as vs
@@ -15,6 +18,7 @@ from Global_vars import KITS_DB_CSV_PATH
 import smtplib, ssl
 from email.message import EmailMessage
 import win32com.client as win32
+from datetime import datetime
 
 OUT_OF_STOCK_ITEMS = []
 
@@ -100,7 +104,7 @@ def classify(obj_sizes: list, ref_sizes: list, perimeters: list) -> Tuple[list, 
     # Classify each object and make a histogram of each type
     for screw in range(n_screws):
         for id in range(n_types):
-            if is_inRange(obj_sizes[screw], ref_sizes[id], 0.40):
+            if is_inRange(obj_sizes[screw], ref_sizes[id], 0.39):
                 if IDs[id] == 'mediano' or IDs[id] == 'tuerca':
                     if perimeters[screw] < 149 :
                         objects.append((screw, 'tuerca'))
@@ -126,7 +130,7 @@ def send_alert_email(kit_type:str, kit_num:int):
     mail = outlook.CreateItem(0)
     mail.To = receivers[0]
     mail.CC=receivers[1]
-    message = 'La estación de armado de kits del ModulaLift ha elaborado ' + kit_num + ' veces el kit ' + kit_type
+    message = 'La estación de armado de kits del ModulaLift ha elaborado ' + kit_num + ' veces el kit ' + kit_type + '\n'
     mail.Subject = 'Kit'  + kit_type + 'Terminado'
     mail.Body = message
     #mail.HTMLBody = '<h2>HTML Message body</h2>' #this field is optional
@@ -134,15 +138,16 @@ def send_alert_email(kit_type:str, kit_num:int):
     # To attach a file to the email (optional):
     #attachment  = "Path to the attachment"
     #mail.Attachments.Add(attachment)
-    try: 
-        mail.Send() 
+    try:  
+        #wpp.sendwhatmsg_instantly(glob.PHONE_NUM,message, 10, True, 5)
+        mail.Send()
     except:
         print("Error: No se envio correo")           
 #END OF FUNCTION send_alert_email()
 
 def send_Out_of_Stock_email():
     KitID = ''
-
+    
     for items in OUT_OF_STOCK_ITEMS:
         KitID += items + ', '
     KitID = KitID[:-2]
@@ -153,7 +158,7 @@ def send_Out_of_Stock_email():
     mail = outlook.CreateItem(0)
     mail.To = receivers[0]
     mail.CC=receivers[1]
-    message = 'La(s) pieza(s)  ' + KitID + ' se ha(n) agotado en el sistema de almacenaje ModulaLift. \n Favor de actualizar el inventario disponible lo antes posible'
+    message = 'La(s) pieza(s)  ' + KitID + ' se ha(n) agotado en el sistema de almacenaje ModulaLift. \n Favor de actualizar el inventario disponible lo antes posible\n'
     mail.Subject = 'Piezas fuera de stock en almacén ModulaLift '
     mail.Body = message
     #mail.HTMLBody = '<h2>HTML Message body</h2>' #this field is optional
@@ -162,7 +167,8 @@ def send_Out_of_Stock_email():
     #attachment  = "Path to the attachment"
     #mail.Attachments.Add(attachment)
     try: 
-        mail.Send() 
+        #wpp.sendwhatmsg_instantly(glob.PHONE_NUM,message, 10, True, 5)
+        mail.Send()
     except:
         print("Error: No se envio correo")
 
@@ -175,9 +181,9 @@ def compare_kits(cmp: dict, ref: dict, img: vs.Mat, kit_type:str, kit_num:int):
     if cmp == ref:
         print(f"{bcolors.OKGREEN}Kit OK{bcolors.ENDC}")
         vs.save_image(img, "Test", "Images/Passed_Kits")
-        send_alert_email(kit_type, kit_num)
-        update_stock(ref)
         plc.write_Vision_Result(Vision_Result.Kit_OK.value)
+        update_stock(ref)
+        #send_alert_email(kit_type, kit_num)
 
         return True
     else:
@@ -223,6 +229,8 @@ def find_missing_screw(cmp: dict, ref: dict) -> Tuple[int, int]:
 def update_stock(ref_kit: dict):
     in_stock: bool = True
 
+    #'camilo: +526142184709'
+
     # List of screws used, to take them off the stock
     subtracts = []
     for key in ref_kit:
@@ -251,9 +259,10 @@ def update_stock(ref_kit: dict):
                 screw_index += 1
                 
         writer.writerows(rows)
-        if not in_stock:
-            send_Out_of_Stock_email()
-            #raise Exception(f"{bcolors.FAIL}OUT OF STOCK{bcolors.ENDC}")
+    if not in_stock:
+        #send_Out_of_Stock_email()
+        #raise Exception(f"{bcolors.FAIL}OUT OF STOCK{bcolors.ENDC}")
+        pass
 #END OF FUNCTION update_stock()
 
 def connect_to_plc():
@@ -269,5 +278,28 @@ def connect_to_plc():
 
     return plc
 #END OF FUNCTION connect_to_plc()
+
+def prevention_Out_of_Stock(ref_kit:dict):
+    df = pd.read_csv(KITS_DB_CSV_PATH)
+    crt_Stock = []
+
+    for i in range (len(df.index)):
+        crt_Stock.append(df.iloc[i][3])
+
+    f : int = 0
+    for v in ref_kit.values():
+        if v > crt_Stock[f]:
+            raise Exception(f"{bcolors.FAIL}OUT OF STOCK{bcolors.ENDC}")
+        f += 1 
+
+
+def prevention_No_Capacity(ref_kit:dict):
+    num_of_screws : int = 0
+    for v in ref_kit.values():
+        num_of_screws += v
+    if num_of_screws > 14:
+        raise Exception(f"{bcolors.FAIL}TRAY OUT OF SPACE{bcolors.ENDC}")
+
+
 
 

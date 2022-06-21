@@ -22,7 +22,10 @@ PLC_DATABLOCK = 2
 PLC_DB_SIZE = 18
 
 # Email Receivers
-EMAIL_RECEIVERS = ['ptimkec@live.com', 'A01566759@tec.mx']  # polo: A01562062@tec.mx
+EMAIL_RECEIVERS = ['A01246180@tec.mx', 'A01566759@tec.mx']  # polo: A01562062@tec.mx     octavio.lasso@tec.mx
+# Phone Number
+PHONE_NUM = "+526145699313"
+    #+526142184709
 
 
 # ---------- GLOBAL VARIABLES ---------- #

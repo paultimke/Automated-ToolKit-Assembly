@@ -181,11 +181,17 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 		# Create kit with the apropiate format needed for classification
 		ref_kit = helper.create_Kit(self.lista_fin)
 
+		# If num of crews is over tray capacity OR screws are Out of Stock -> send Exception
+		helper.prevention_No_Capacity(ref_kit)
+		helper.prevention_Out_of_Stock(ref_kit)
+		
 		# Send Commands to Robot and Conveyor PLC to start Assembly
 		DESIRED_KIT_NAME   : str = self.lista_fin[0]
 		DESIRED_ITERATIONS : int = self.lista_fin[1]
 
 		for _ in range (DESIRED_ITERATIONS):
+			print(f"\nRef kit: {self.lista_fin}")
+
 			main.Start_Assembly(DESIRED_KIT_NAME, ref_kit)
 
 			# Espera hasta que PLC termine para empezar Vision
@@ -195,13 +201,13 @@ class root(tk.Tk):#******************************* VENTANA PRINCIPAL ***********
 					kit_ok = main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
 				time.sleep(0.2)
 
-		# Para pruebas de vision. Usar linea de abajo y comentar lo de arriba
-		#main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
-
-			print(f"Ref kit: {self.lista_fin}")
-
 			if DESIRED_ITERATIONS != 1:
 				time.sleep(15)
+
+
+		# Para pruebas de vision. Usar linea de abajo y comentar lo de arriba
+		""" main.Verify_Kit(ref_kit, DESIRED_KIT_NAME, DESIRED_ITERATIONS)
+		print(f"Ref kit: {self.lista_fin}") """
 
 		# Process is done, now we can enable the Button again
 		global_vars.StartProcess_Btn.grid(column=4, row=1)

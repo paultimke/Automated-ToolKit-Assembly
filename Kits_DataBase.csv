@@ -1,5 +1,5 @@
 Name,Length,Width,Stock,Tray_ID,Screw_ID
-grande,8.2,1.9,0,1,1
-mediano,3.21,1.7,3,1,2
-flaco,3.5,0.67,2,2,3
-tuerca,2.02,2.06,8,2,4
+grande,8.2,1.9,66,1,1
+mediano,3.21,1.7,0,1,2
+flaco,3.5,0.67,65,2,3
+tuerca,2.02,2.06,57,2,4
