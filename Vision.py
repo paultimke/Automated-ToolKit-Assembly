@@ -136,9 +136,9 @@ def vimba2binary(img) ->Mat:
     it into a binary array 
     @img parameter image (3 dimensions Mat) - Vimba Frame"""
 
-    THRESHOLD = 40
+    THRESHOLD = 60
 
-    # 12:00 pm - THRESHOLD = 60
+    # 10:00 am - 12:00 pm - THRESHOLD = 64
     # 4:00 pm -THRESHOLD = 50
     # 5:30 pm - TRESHOLD = 50
     # 7:00 pm - THRESHOLD = 15
@@ -197,11 +197,12 @@ def count_objects_AnP(image:Mat) -> Mat:
         # find its area in pixel
         area = cv2.contourArea(cnt)
         # minimum area value is to be fixed
-        if (area > 100):
+        if (area > 100 ):
             i = i +1
             perimeter = cv2.arcLength(cnt, True)
             #print(len(approx))
-            finalContours.append([area, perimeter])
+            #finalContours.append([area, perimeter])
+            finalContours.append(perimeter)
             if DEBUG:
                 print("Area",i,"= ", area)
                 print("Perim",i,"= ", round(perimeter,2),"\n")
@@ -341,10 +342,10 @@ def img_detectSizes() -> Tuple[Mat, list]:
     #img,_ = get_image_from_path("Images/ParaChristian/Ref-img_26cm_31_05_2022__19h-27m-41s.png")
     #img = RGB2binary(img)
 
-    _, contours = count_objects_AnP(img)
+    perims, contours = count_objects_AnP(img)
     img, sizes = measure_objects(img, contours, ref_size)
     
-    return (img, sizes)
+    return (img, sizes, perims)
 
 
 def calibrate_cam(path_to_img: str, reference: int) -> int:

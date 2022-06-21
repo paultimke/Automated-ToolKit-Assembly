@@ -63,6 +63,26 @@ class PLC:
         snap7.util.set_int(self.__DB, 8, value)
         self.__client.db_write(self.__DBnum, 8, self.__DB[8:10])
 
+    def write_Grande_Cant(self, value: int) -> None:
+        # Screw_Bandeja resides in Bytes 10 and 11, so start offset is 10
+        snap7.util.set_int(self.__DB, 10, value)
+        self.__client.db_write(self.__DBnum, 10, self.__DB[10:12])
+
+    def write_Mediano_Cant(self, value: int) -> None:
+        # Screw_Bandeja resides in Bytes 12 and 12, so start offset is 12
+        snap7.util.set_int(self.__DB, 12, value)
+        self.__client.db_write(self.__DBnum, 12, self.__DB[12:14])
+
+    def write_Flaco_Cant(self, value: int) -> None:
+        # Screw_Bandeja resides in Bytes 14 and 15, so start offset is 14
+        snap7.util.set_int(self.__DB, 14, value)
+        self.__client.db_write(self.__DBnum, 14, self.__DB[14:16])
+
+    def write_Tuerca_Cant(self, value: int) -> None:
+        # Screw_Bandeja resides in Bytes 16 and 17, so start offset is 16
+        snap7.util.set_int(self.__DB, 16, value)
+        self.__client.db_write(self.__DBnum, 16, self.__DB[16:18])
+
     # ----- Data Reading methods ----- #
     def read_Start_vision_cmd(self) -> bool:
         self.__DB = self.__client.db_get(self.__DBnum)
